@@ -1,0 +1,1602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2D6A4C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mealboard">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Mealboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D6A4C'/%3E%3Cpath d='M18 44V22l14 12 14-12v22' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: app shell. Header with brand + tabs (tabs dock to the bottom on phones), one working view below, recipes as a tile grid, details in a sheet. */
+:root{
+  --bg:#F1F3EE; --surface:#FFFFFF; --sunk:#E6EAE2; --ink:#18221C; --muted:#58645C; --line:#D5DBD1;
+  --accent:#2D6A4C; --accent-ink:#FFFFFF; --accent-soft:#DCEBE1;
+  --gold:#C98A12; --gold-soft:#F6E7C4; --danger:#B03A26; --danger-soft:#F6DED8;
+  --scrim:rgba(18,26,21,.42); --shadow:0 1px 2px rgba(20,30,24,.06),0 6px 18px rgba(20,30,24,.07);
+  --cat-l:40%; --cat-s:48%;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111612; --surface:#1A211C; --sunk:#232C26; --ink:#E8EDE7; --muted:#9AA69D; --line:#2E3931;
+  --accent:#74C49A; --accent-ink:#0D1A12; --accent-soft:#1F3328;
+  --gold:#E8B54A; --gold-soft:#3A3020; --danger:#EC7A63; --danger-soft:#3D221D;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35); --cat-l:66%; --cat-s:45%; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#111612; --surface:#1A211C; --sunk:#232C26; --ink:#E8EDE7; --muted:#9AA69D; --line:#2E3931;
+  --accent:#74C49A; --accent-ink:#0D1A12; --accent-soft:#1F3328;
+  --gold:#E8B54A; --gold-soft:#3A3020; --danger:#EC7A63; --danger-soft:#3D221D;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35); --cat-l:66%; --cat-s:45%; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+.app{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:0 112px}
+
+/* header + tabs  */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px 14px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:1.65rem;font-weight:800;letter-spacing:-.02em}
+.brand .wk{font-size:.8rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:10px;color:var(--muted);font-size:.78rem;font-weight:700;position:relative}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.tab .badge{position:absolute;top:2px;right:calc(50% - 22px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--gold);color:#1b1405;font-size:.7rem;line-height:18px;font-variant-numeric:tabular-nums}
+@media (min-width:860px){
+  .app{padding-block:0 48px}
+  .tabs{position:static;display:flex;gap:4px;background:var(--sunk);border:0;padding:4px;border-radius:12px}
+  .tab{flex-direction:row;gap:8px;padding:8px 14px;font-size:.92rem}
+  .tab svg{width:18px;height:18px}
+  .tab .badge{position:static}
+}
+
+/* generic */
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.spread{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.view-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-block:8px 18px}
+.view-head h2{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;letter-spacing:-.02em}
+.view-head p{margin:4px 0 0;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:9px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.95rem}
+.btn svg{width:18px;height:18px;flex:none}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.quiet:hover{color:var(--ink);background:var(--sunk)}
+.btn.danger{color:var(--danger);border-color:var(--danger-soft)}
+.btn.armed{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn.small{min-height:36px;padding:6px 12px;font-size:.88rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.lbl{font-weight:700;font-size:.9rem}
+.hint{font-size:.85rem;color:var(--muted)}
+input[type=text],input[type=number],input[type=search],input[type=password],select,textarea{
+  width:100%;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+textarea{min-height:96px;resize:vertical;line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:38px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.9rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.stepper button{width:44px;height:44px;border:0;background:none;font-size:1.3rem;font-weight:700;color:var(--accent)}
+.stepper button:disabled{color:var(--line);cursor:not-allowed}
+.stepper output{min-width:42px;text-align:center;font-weight:700;font-size:1.1rem;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.catdot{display:inline-block;width:10px;height:10px;border-radius:3px;background:hsl(var(--h,140) var(--cat-s) var(--cat-l));flex:none}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--accent-soft);border-top-color:var(--accent);animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:3s}}
+.busy{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r);background:var(--accent-soft);font-weight:700}
+.busy small{display:block;font-weight:400;color:var(--muted)}
+.empty{text-align:center;padding:40px 20px;border:1.5px dashed var(--line);border-radius:var(--r)}
+.empty h3{font-size:1.3rem;margin-bottom:6px}
+.empty p{color:var(--muted);margin:0 auto 16px;max-width:42ch}
+
+/* generate */
+.gen{display:grid;gap:20px;grid-template-columns:1fr}
+@media (min-width:900px){.gen{grid-template-columns:340px minmax(0,1fr);align-items:start}.gen .settings{position:sticky;top:12px}}
+details.settings>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.settings>summary::-webkit-details-marker{display:none}
+details.settings>summary h3{font-size:1.15rem}
+details.settings[open]>summary{margin-bottom:16px}
+.sumline{font-size:.88rem;color:var(--muted)}
+.progress{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pips{display:flex;gap:5px;flex-wrap:wrap}
+.pip{width:14px;height:14px;border-radius:4px;background:var(--sunk);border:1px solid var(--line)}
+.pip.on{background:var(--accent);border-color:var(--accent)}
+.cands{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
+.cand{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.cand.picked{border:2px solid var(--accent);background:var(--accent-soft);padding:15px}
+.cand h3{font-size:1.18rem;font-weight:700}
+.cand p{margin:0;color:var(--muted);font-size:.95rem}
+.cand .ings{font-size:.85rem;color:var(--muted)}
+.cand .acts{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:auto;padding-top:6px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:.84rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta .cost{color:var(--gold);font-weight:700;letter-spacing:.05em}
+.buildbar{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:14px;padding:12px 14px;margin-top:16px}
+@media (min-width:860px){.buildbar{bottom:16px}}
+
+/* tiles */
+.tiles{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr))}
+.tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.tile-open{display:flex;flex-direction:column;gap:8px;width:100%;height:100%;text-align:left;border:0;background:none;padding:16px 16px 14px;border-radius:var(--r)}
+.tile-open:hover{background:var(--sunk)}
+.tile h3{font-size:1.22rem;font-weight:700;padding-right:40px}
+.tile .eyebrow{display:flex;align-items:center;gap:7px;padding-right:40px}
+.tile .meta{margin-top:auto}
+.tile-check{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;color:transparent}
+.tile-check svg{width:18px;height:18px}
+.tile-check:hover{border-color:var(--accent);color:var(--accent)}
+.tile.done .tile-check{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tile.done h3{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
+.tile.done{background:var(--sunk)}
+.stars-mini{display:inline-flex;gap:1px;color:var(--gold)}
+.stars-mini svg{width:14px;height:14px}
+.fav{color:var(--danger);display:inline-flex}
+.fav svg{width:16px;height:16px}
+.sectionlabel{display:flex;align-items:center;gap:10px;margin:26px 0 12px}
+.sectionlabel h3{font-size:1.05rem}
+.sectionlabel hr{flex:1;border:0;border-top:1px solid var(--line);margin:0}
+
+/* shopping */
+.shop{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));align-items:start}
+.aisle h3{font-size:1.05rem;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.aisle h3 span{font-family:var(--f-body);font-size:.8rem;color:var(--muted);font-weight:400}
+.item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.item:first-of-type{border-top:0}
+.item input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent)}
+.item .nm{font-weight:700}
+.item .for{display:block;font-size:.8rem;color:var(--muted);font-weight:400}
+.item .qty{font-variant-numeric:tabular-nums;color:var(--muted);text-align:right;font-size:.92rem}
+.item.got .nm,.item.got .qty{text-decoration:line-through;color:var(--muted)}
+.tag{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--sunk);color:var(--muted);margin-left:6px;vertical-align:2px}
+.notice{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:var(--r);background:var(--gold-soft);margin-bottom:16px}
+
+/* recipe box */
+.boxbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.boxbar input{max-width:280px}
+.seg{display:inline-flex;background:var(--sunk);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:7px 12px;border-radius:8px;font-weight:700;font-size:.88rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:720px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;
+  padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){.scrim{align-items:center;padding:24px}.sheet{border-radius:18px;max-height:90vh;padding:26px 28px}}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+.sheet-head h2{font-size:clamp(1.5rem,4vw,2rem);font-weight:800;letter-spacing:-.015em}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+.x svg{width:18px;height:18px}
+.stars{display:flex;gap:4px}
+.stars button{border:0;background:none;padding:4px;color:var(--line)}
+.stars button.on{color:var(--gold)}
+.stars svg{width:30px;height:30px}
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.toggle{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.9rem;color:var(--muted)}
+.toggle svg{width:17px;height:17px}
+.toggle[aria-pressed="true"]{color:var(--ink);background:var(--accent-soft);border-color:var(--accent)}
+.toggle.fav-t[aria-pressed="true"]{background:var(--danger-soft);border-color:var(--danger)}
+.toggle.fav-t[aria-pressed="true"] svg{color:var(--danger)}
+.recipe-cols{display:grid;gap:22px;grid-template-columns:1fr;margin-top:18px}
+@media (min-width:760px){.recipe-cols{grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr)}}
+.recipe-cols h3{font-size:1.1rem;margin-bottom:8px}
+.ing{list-style:none;margin:0;padding:0}
+.ing li{display:flex;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.ing li:first-child{border-top:0}
+.ing b{font-variant-numeric:tabular-nums;min-width:4.5em;flex:none}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:8px 0;max-width:65ch}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:800;color:var(--accent);font-size:1.15rem;line-height:1.35}
+.tipbox{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--gold-soft);font-size:.95rem}
+.photo-drop{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px;border:1.5px dashed var(--line);border-radius:var(--r)}
+.photo-drop img{width:72px;height:72px;object-fit:cover;border-radius:8px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:10px;font-weight:700;font-size:.92rem;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
+@media (min-width:860px){.toast{bottom:24px}}
+.loading{display:flex;align-items:center;gap:12px;justify-content:center;padding:80px 0;color:var(--muted)}
+.engine{font-size:.85rem;color:var(--muted);padding:10px 12px;border-radius:10px;background:var(--sunk)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+<style>
+/* additions for the standalone build */
+html,body{margin:0}
+body{-webkit-text-size-adjust:100%}
+.app{padding-top:env(safe-area-inset-top,0px)}
+.top-right{display:flex;align-items:center;gap:10px}
+.brand .wk{white-space:nowrap}
+.acct{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.acct .av{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.78rem}
+.acct.armed{background:var(--danger);border-color:var(--danger);color:#fff}
+.acct .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.controls{display:flex;flex-direction:column;gap:16px}
+details.fold{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;min-height:48px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary .t{font-weight:700}
+details.fold>summary .s{display:block;font-size:.85rem;color:var(--muted);font-weight:400}
+details.fold>summary .chev{width:18px;height:18px;transition:transform .15s;color:var(--muted);flex:none}
+details.fold[open]>summary .chev{transform:rotate(180deg)}
+details.fold>.inner{display:flex;flex-direction:column;gap:16px;padding:4px 12px 14px}
+@media (prefers-reduced-motion:reduce){details.fold>summary .chev{transition:none}}
+.reqrow input{min-height:46px}
+.genbtn{width:100%}
+.fullnote{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+.warnbox{padding:12px 14px;border-radius:10px;background:var(--gold-soft);font-size:.92rem}
+.okline{font-size:.88rem;color:var(--muted)}
+code{font-size:.85em;background:var(--sunk);padding:1px 5px;border-radius:5px}
+.favbadge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:var(--danger-soft);color:var(--danger);letter-spacing:.04em}
+.favbadge svg{width:12px;height:12px}
+.shares,.left{display:inline-flex;align-items:center;gap:5px;font-size:.84rem;color:var(--accent);font-weight:700}
+.shares svg,.left svg{width:15px;height:15px;flex:none}
+.left{display:flex;font-weight:400;margin-top:2px;color:var(--gold)}
+.useup{margin-bottom:16px;background:var(--accent-soft);border-color:transparent}
+.useup h3{display:flex;align-items:center;gap:8px;font-size:1.1rem;margin-bottom:6px}
+.useup h3 svg{width:20px;height:20px;color:var(--accent)}
+.useup ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;max-width:70ch}
+/* header: never wider than the phone */
+.app{overflow-x:clip}
+.top{flex-wrap:nowrap;min-width:0}
+.brand{min-width:0;flex-wrap:wrap;row-gap:0}
+.top-right{flex:none}
+.gear{position:relative;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--muted);flex:none}
+.gear svg{width:21px;height:21px}
+.gear:hover{color:var(--ink)}
+.gdot{position:absolute;top:6px;right:6px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.gdot.warn{background:var(--gold)}
+@media (max-width:420px){.brand h1{font-size:1.45rem}.brand .wk{font-size:.72rem}}
+/* settings sheet */
+.setsec{display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:1px solid var(--line)}
+.setsec:first-child{border-top:0;padding-top:0}
+.setsec h3{font-size:1.1rem}
+.setsec .hint{margin:0}
+code.code{word-break:break-all}
+.joinrow{display:flex;gap:8px;min-width:0}
+.joinrow input{min-width:0;flex:1}
+/* tiles */
+.tile.nocheck h3,.tile.nocheck .eyebrow{padding-right:0}
+.writing{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--accent);font-weight:700}
+.writing .spin{width:14px;height:14px;border-width:2px}
+.writing.failed{color:var(--danger)}
+.btn .spin{width:14px;height:14px;border-width:2px}
+/* photos */
+.photo-drop{flex-direction:column;align-items:flex-start}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumb{position:relative}
+.thumb img{width:76px;height:76px;object-fit:cover;border-radius:8px;display:block}
+.thumb button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;color:var(--ink)}
+.thumb button svg{width:13px;height:13px}
+/* shopping */
+.addbox{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.addbox textarea{min-height:64px}
+.item{grid-template-columns:28px minmax(0,1fr) auto auto;cursor:default}
+.item .nm{cursor:pointer;min-width:0;overflow-wrap:anywhere}
+.rmx{width:30px;height:30px;border-radius:50%;border:0;background:none;color:var(--muted);display:grid;place-items:center;padding:0;margin-top:-3px}
+.rmx svg{width:15px;height:15px}
+.rmx:hover{color:var(--danger);background:var(--danger-soft)}
+.notice{margin-bottom:16px}
+</style>
+
+<script>
+/* Shows a readable message instead of an endless loading screen if something breaks at startup. */
+window.__mbErrors = [];
+window.addEventListener("error", function (e) {
+  var msg = (e && e.message) || "Unknown error";
+  window.__mbErrors.push(msg + (e && e.lineno ? " on line " + e.lineno : ""));
+  setTimeout(function () {
+    if (window.__mbLoaded) return;
+    var v = document.getElementById("view"); if (!v) return;
+    var p = document.createElement("p"); p.textContent = window.__mbErrors.join(" | ");
+    v.innerHTML = '<div class="empty" style="margin-top:20px"><h3>The app couldn\u2019t start</h3></div>';
+    v.firstChild.appendChild(p);
+    var p2 = document.createElement("p"); p2.textContent = "This usually means a typo in the Firebase settings block near the bottom of index.html. Send this message to whoever set up the app."; v.firstChild.appendChild(p2);
+  }, 1500);
+});
+</script>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand"><h1>Mealboard</h1><span class="wk" id="wk"></span></div>
+    <div class="top-right"><nav class="tabs" id="tabs" aria-label="Sections"></nav><span id="acct"></span></div>
+  </header>
+  <main id="view"><div class="loading"><span class="spin"></span>Loading your meals…</div></main>
+</div>
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* =====================================================================
+   PASTE YOUR FIREBASE SETTINGS HERE
+   Firebase console > Project settings (gear icon) > General > Your apps > Web app.
+   Copy ONLY the values between the { } of "const firebaseConfig = { ... }".
+   Do not copy the "import" or "initializeApp" lines; the app does that itself.
+   Keep the quotes and the comma at the end of each line.
+   These values are meant to be public; the Firestore rules protect your data.
+   Leave apiKey as "" to run without sync (meals stay on each device).
+   ===================================================================== */
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBd9a-dUgDnRE5A-CLebhWpbnmUeEUqxjs",
+  authDomain: "mealplannerweb-3352f.firebaseapp.com",
+  projectId: "mealplannerweb-3352f",
+  storageBucket: "mealplannerweb-3352f.firebasestorage.app",
+  messagingSenderId: "5276547091",
+  appId: "1:5276547091:web:c883a3ff85600d90ba27e6"
+};
+</script>
+<script type="module">
+/* Firebase settings are in the separate <script> block just above this one. */
+const FIREBASE_CONFIG = (window.FIREBASE_CONFIG && typeof window.FIREBASE_CONFIG === "object") ? window.FIREBASE_CONFIG : {};
+const CONFIG_BROKEN = !window.FIREBASE_CONFIG;
+/* 2. Your Gemini API key is NOT stored in this file (GitHub pages are public).
+      Paste it in the app under Suggest > Connections. It is saved in your
+      household's Firestore space (only members can read it) and on the device.
+   3. Paste the Firestore security rules from the setup notes into
+      Firebase console > Firestore Database > Rules. */
+const DEFAULT_GEMINI_MODEL = "auto";
+const FIREBASE_VERSION = "10.12.2";
+
+/* ---------- constants ---------- */
+const CATS = ["Chicken","Beef","Pork","Seafood","Vegetarian","Pasta","Soup & Stew","Salad","Breakfast","Other"];
+const HUE = {"Chicken":36,"Beef":6,"Pork":340,"Seafood":200,"Vegetarian":118,"Pasta":48,"Soup & Stew":22,"Salad":88,"Breakfast":54,"Other":262};
+const TYPES = [["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"]];
+const OPTIONS = [["lowwaste","Low food waste"],["budget","Budget friendly"],["quick","Under 30 minutes"],["slowcooker","Include slow cooker"],["healthy","Lighter / healthy"],["leftovers","Good for leftovers"]];
+const OPT_TEXT = {lowwaste:"minimize food waste: favor meals that share perishable ingredients (fresh herbs, produce, dairy, proteins) so partly used packages get finished, and avoid ingredients that are only sold in large amounts when a meal would barely use them",budget:"keep it budget friendly with affordable, common ingredients",quick:"total time 30 minutes or less",slowcooker:"include slow cooker (Crock-Pot) meals: make roughly a quarter of the ideas, and at least one, slow cooker dishes, and write those recipes with slow cooker steps and times",healthy:"lighter, healthier meals",leftovers:"meals that reheat well as leftovers"};
+const SECTIONS = ["Produce","Meat & Seafood","Dairy & Eggs","Bakery","Pantry","Spices & Condiments","Frozen","Other"];
+const DEFAULT_SETTINGS = {people:4, meals:4, mealTypes:["dinner"], options:{lowwaste:true}, requests:"", favorites:1};
+/* "Low food waste" is on unless it was turned off. */
+const optOn = k => k === "lowwaste" ? (S.settings.options || {}).lowwaste !== false : !!(S.settings.options || {})[k];
+const lowWaste = () => optOn("lowwaste");
+const LS_KEY = "mealboard-v1", LS_GEM = "mealboard-gemini-key", LS_MODEL = "mealboard-gemini-model";
+
+const IC = {
+  plan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14l2 2 4-4"/></svg>',
+  gen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>',
+  shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 014 4v12H8a4 4 0 01-4-4z"/><path d="M8 9h8M8 13h6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3L2.9 9.4l6.3-.8z"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.2 3.3 4.5 7 4.5c2.1 0 3.6 1.1 5 3 1.4-1.9 2.9-3 5-3 3.7 0 6 3.7 4.5 7.3C19.5 16.4 12 21 12 21z"/></svg>',
+  heartO:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.3-8.9-8.6C1.7 8 3.8 5 7.1 5c2 0 3.4 1 4.9 2.9C13.5 6 14.9 5 16.9 5c3.3 0 5.4 3 4 6.4C19 15.7 12 20 12 20z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15"/><path d="M5 19l7-7"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
+};
+
+/* ---------- helpers ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const clone = o => JSON.parse(JSON.stringify(o));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const cap = s => s ? s[0].toUpperCase() + s.slice(1) : "";
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+const num = (v, d = null) => { if (v === "" || v == null) return d; const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : d; };
+
+const FRAC = [[.125,"⅛"],[.25,"¼"],[1/3,"⅓"],[.5,"½"],[2/3,"⅔"],[.75,"¾"]];
+function fmtQty(q){
+  if (q == null || q === "" || !Number.isFinite(Number(q))) return "";
+  q = Number(q); const w = Math.floor(q), f = q - w;
+  if (f < .06) return String(w || q);
+  for (const [v, s] of FRAC) if (Math.abs(f - v) < .06) return (w ? w : "") + s;
+  return String(Math.round(q * 100) / 100);
+}
+const ingAmount = i => [fmtQty(i.quantity), i.unit || ""].filter(Boolean).join(" ");
+const ingText = i => { const a = ingAmount(i); return (a ? a + " " : "") + (i.item || "") + (i.note ? ", " + i.note : ""); };
+
+/* ---------- state ---------- */
+const S = {
+  settings: clone(DEFAULT_SETTINGS),
+  plan: { candidates: [], rejected: [], shopping: null },
+  recipes: {},
+  extras: [],
+  view: null, sheet: null, busy: null, loaded: false, armed: null,
+  open: { settings: false, conn: false, house: false },
+  filter: { tab: "all", cat: "", q: "" }, hidePantry: false
+};
+const recipesArr = () => Object.values(S.recipes);
+const planRecipes = () => recipesArr().filter(r => r.inPlan).sort((a, b) => (a.done - b.done) || (a.addedAt || 0) - (b.addedAt || 0));
+const openMeals = () => planRecipes().filter(r => !r.done);
+const picked = () => S.plan.candidates.filter(c => c.status === "picked");
+/* Everything in this week's plan counts as picked, including meals added from the Recipes page. */
+const weekCount = () => planRecipes().length;
+const pendingRecipes = () => planRecipes().filter(r => r.pending);
+/* Initial suggestions: 2 x meals to plan, at least 5, at most meals + 5. */
+const initialCount = () => clamp(2 * S.settings.meals, 5, S.settings.meals + 5);
+
+/* ---------- storage: Firestore when signed in, else this device ---------- */
+const store = { mode: "local", fb: null, fbError: "", user: null, hid: null, house: null, timers: {}, chains: {}, seq: {}, pending: new Set(), unsub: null, unsubHouse: null };
+function docData(key){
+  if (key === "settings") return { kind: "settings", ...S.settings };
+  if (key === "plan") { const p = { ...S.plan }; delete p.shopping; return { kind: "plan", ...p }; }
+  if (key === "shopping") return { kind: "shopping", list: S.plan.shopping || null };
+  if (key === "extras") return { kind: "extras", items: S.extras };
+  if (key === "secrets") return { kind: "secrets", geminiKey: gemKey(), geminiModel: gemModel() };
+  const r = S.recipes[key.slice(2)];
+  return r ? { kind: "recipe", ...r } : null;
+}
+function saveLocal(){
+  clearTimeout(store.timers.ls);
+  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras })), 200);
+}
+const itemRef = key => store.fb.F.doc(store.fb.db, "households", store.hid, "items", key);
+function persist(key){
+  if (store.mode !== "cloud") { saveLocal(); return; }
+  const { F } = store.fb, hid = store.hid;
+  store.pending.add(key);
+  const my = store.seq[key] = (store.seq[key] || 0) + 1;
+  clearTimeout(store.timers[key]);
+  store.timers[key] = setTimeout(() => {
+    if (store.hid !== hid) return;
+    const data = docData(key);
+    const ref = itemRef(key);
+    store.chains[key] = (store.chains[key] || Promise.resolve())
+      .then(() => data ? F.setDoc(ref, clone(data)) : F.deleteDoc(ref))
+      .catch(e => { console.error(e); toast(e && e.code === "permission-denied" ? "Firestore refused the save. Check your security rules." : "Couldn't save that change. Check your connection."); })
+      .finally(() => { if (store.seq[key] === my) store.pending.delete(key); });
+  }, 350);
+}
+const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("extras"); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
+const saveRecipe = r => { S.recipes[r.id] = r; persist("r-" + r.id); };
+function strip(d){ const o = { ...d }; delete o.kind; return o; }
+function applyDoc(id, d){
+  if (!d) { if (id.startsWith("r-")) delete S.recipes[id.slice(2)]; if (id === "shopping") S.plan.shopping = null; return; }
+  if (id === "settings") S.settings = { ...clone(DEFAULT_SETTINGS), ...strip(d) };
+  else if (id === "plan") { const sh = S.plan.shopping; S.plan = { candidates: [], rejected: [], ...strip(d), shopping: d.shopping || sh || null }; }
+  else if (id === "shopping") S.plan.shopping = d.list || null;
+  else if (id === "extras") S.extras = Array.isArray(d.items) ? d.items : [];
+  else if (id === "secrets") { if (d.geminiKey) lsSet(LS_GEM, d.geminiKey); if (d.geminiModel) lsSet(LS_MODEL, d.geminiModel); }
+  else if (d.kind === "recipe" && d.id) S.recipes[d.id] = strip(d);
+}
+function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [], shopping: null }; S.recipes = {}; S.extras = []; }
+function loadLocal(){
+  resetState();
+  try {
+    const d = JSON.parse(lsGet(LS_KEY) || "null");
+    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], shopping: null, ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; }
+  } catch {}
+}
+const isEditing = () => { const a = document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName); };
+
+/* invite link: ?join=<household code> */
+let pendingJoin = (() => { try { const c = new URLSearchParams(location.search).get("join"); return c && /^[A-Za-z0-9]{12,40}$/.test(c) ? c : ""; } catch { return ""; } })();
+function clearJoinParam(){ pendingJoin = ""; try { const u = new URL(location.href); u.searchParams.delete("join"); history.replaceState(null, "", u.pathname + u.search + u.hash); } catch {} }
+const newCode = () => { const c = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789"; const a = new Uint32Array(20); crypto.getRandomValues(a); return [...a].map(x => c[x % c.length]).join(""); };
+const myName = () => (store.user && (store.user.displayName || (store.user.email || "").split("@")[0])) || "Someone";
+const inviteLink = () => location.origin + location.pathname + "?join=" + store.hid;
+
+const withTimeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code: "timeout", message: what }), ms))]);
+async function initFirebase(){
+  if (CONFIG_BROKEN) { store.fbError = "The Firebase settings block in index.html has a typo" + (window.__mbErrors && window.__mbErrors.length ? " (" + window.__mbErrors[0] + ")" : "") + ". Compare it with the example in the file, fix it and upload again. Until then, meals are saved on this device only."; return null; }
+  if (!FIREBASE_CONFIG.apiKey) return null;
+  const missing = ["apiKey","authDomain","projectId","appId"].filter(k => !FIREBASE_CONFIG[k]);
+  if (missing.length) { store.fbError = "The Firebase settings are missing: " + missing.join(", ") + ". Copy them from Firebase > Project settings > Your apps."; return null; }
+  const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/`;
+  try {
+    const [A0, A, F] = await withTimeout(Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]), 15000, "loading Firebase");
+    const app = A0.initializeApp(FIREBASE_CONFIG);
+    store.fb = { A, F, auth: A.getAuth(app), db: F.getFirestore(app) };
+    A.getRedirectResult(store.fb.auth).catch(e => { if (e && e.code) toast(authErr(e)); });
+    return await withTimeout(new Promise(res => { let first = true; A.onAuthStateChanged(store.fb.auth, u => { if (first) { first = false; res(u); } else onUserChange(u); }); }), 10000, "sign-in check");
+  } catch (e) {
+    console.error(e);
+    store.fbError = e && e.code === "timeout" ? "Firebase didn't respond. Check your connection, then reload." :
+      /api-key|invalid-api-key|API key/i.test(String(e && (e.code || e.message))) ? "Firebase rejected the apiKey in index.html. Copy the settings again from Firebase > Project settings > Your apps." :
+      "Couldn't start Firebase: " + (e && (e.message || e.code) || "unknown error");
+    if (!(e && e.code === "timeout")) store.fb = null;
+    return null;
+  }
+}
+function authErr(e){
+  const c = e && e.code || "";
+  if (c.includes("unauthorized-domain")) return "Add this site's address to Firebase > Authentication > Settings > Authorized domains.";
+  if (c.includes("operation-not-allowed")) return "Turn on Google sign-in in Firebase > Authentication > Sign-in method.";
+  if (c.includes("popup-closed") || c.includes("cancelled-popup")) return "Sign-in was closed before it finished.";
+  return "Sign-in didn't work: " + (e.message || c);
+}
+async function signIn(){
+  const { A, auth } = store.fb; const p = new A.GoogleAuthProvider();
+  try { await A.signInWithPopup(auth, p); }
+  catch (e) {
+    if (String(e.code).includes("popup-blocked") || String(e.code).includes("operation-not-supported")) { try { await A.signInWithRedirect(auth, p); } catch (e2) { toast(authErr(e2)); } }
+    else toast(authErr(e));
+  }
+}
+function fsMsg(e, what){
+  const c = String(e && e.code || ""), m = String(e && e.message || "");
+  if (c === "permission-denied") return "Firestore refused access. Paste the rules from firestore.rules into Firebase > Firestore Database > Rules and click Publish.";
+  if (/does not exist|not-found|NOT_FOUND/i.test(c + m) && /database/i.test(m)) return "Your project has no Firestore database yet. In Firebase, open Firestore Database and click Create database.";
+  if (c === "timeout" || c === "unavailable" || /offline/i.test(m)) return "Couldn't reach Firestore. Check your connection, then reload. Meals are saved on this device for now.";
+  return what + (m ? " (" + m + ")" : "");
+}
+function fsErr(e, what){ console.error(e); const msg = fsMsg(e, what); store.fbError = msg; toast(msg); }
+
+/* Find (or create) this person's household, then load and watch it. */
+async function connectCloud(u){
+  const { F, db } = store.fb;
+  store.user = u; store.fbError = "";
+  const profRef = F.doc(db, "users", u.uid);
+  let hid = null;
+  try {
+    const prof = await F.getDoc(profRef);
+    hid = prof.exists() ? prof.data().householdId || null : null;
+    if (hid) {
+      const h = await F.getDoc(F.doc(db, "households", hid)).catch(() => null);
+      if (!h || !h.exists() || !(h.data().members || []).includes(u.uid)) hid = null;
+    }
+    if (!hid) {
+      hid = newCode();
+      await F.setDoc(F.doc(db, "households", hid), { owner: u.uid, members: [u.uid], names: { [u.uid]: myName() }, createdAt: Date.now() });
+      await F.setDoc(profRef, { householdId: hid }, { merge: true });
+      // bring along anything saved by the earlier version of the app, else what's on this device
+      const old = await F.getDocs(F.collection(db, "users", u.uid, "mealboard")).catch(() => null);
+      if (old && !old.empty) { resetState(); old.docs.forEach(d => applyDoc(d.id, d.data())); }
+      await openHousehold(hid, { upload: true });
+    } else await openHousehold(hid);
+    return true;
+  } catch (e) { fsErr(e, "Couldn't load your saved meals."); store.user = null; store.mode = "local"; return false; }
+}
+async function openHousehold(hid, { upload = false } = {}){
+  const { F, db } = store.fb;
+  if (store.unsub) { store.unsub(); store.unsub = null; }
+  if (store.unsubHouse) { store.unsubHouse(); store.unsubHouse = null; }
+  store.pending.clear();
+  store.hid = hid; store.mode = "cloud";
+  const col = F.collection(db, "households", hid, "items");
+  if (upload) persistAll();
+  else {
+    const snap = await F.getDocs(col);
+    resetState(); snap.docs.forEach(d => applyDoc(d.id, d.data()));
+    if (gemKey() && !snap.docs.some(d => d.id === "secrets")) persist("secrets");
+  }
+  store.unsub = F.onSnapshot(col, s => {
+    let changed = false;
+    for (const ch of s.docChanges()) {
+      const key = ch.doc.id;
+      if (ch.doc.metadata.hasPendingWrites || store.pending.has(key)) continue;
+      applyDoc(key, ch.type === "removed" ? null : ch.doc.data()); changed = true;
+    }
+    if (changed) syncCandidates();
+    if (changed && !isEditing() && !S.busy && S.loaded) { render(); }
+  }, e => console.error(e));
+  store.unsubHouse = F.onSnapshot(F.doc(db, "households", hid), d => {
+    store.house = d.exists() ? d.data() : null;
+    if (S.loaded && S.sheet && S.sheet.type === "settings" && !isEditing()) renderSheet();
+  }, e => console.error(e));
+}
+async function joinHousehold(code){
+  code = String(code || "").trim().replace(/^.*[?&]join=/, "").replace(/[^A-Za-z0-9]/g, "");
+  if (!store.user) { toast("Sign in first, then join."); return; }
+  if (!code) { toast("Paste the household code or invite link."); return; }
+  if (code === store.hid) { toast("You're already in this household."); clearJoinParam(); render(); return; }
+  const { F, db } = store.fb, u = store.user;
+  try {
+    const ref = F.doc(db, "households", code);
+    const h = await F.getDoc(ref);
+    if (!h.exists()) { toast("No household has that code. Check it and try again."); return; }
+    await F.updateDoc(ref, { members: F.arrayUnion(u.uid), ["names." + u.uid]: myName() });
+    await F.setDoc(F.doc(db, "users", u.uid), { householdId: code }, { merge: true });
+    clearJoinParam();
+    await openHousehold(code);
+    S.view = openMeals().length ? "plan" : "generate"; render();
+    toast("You joined the household. Everyone now sees the same meals and list.");
+  } catch (e) { fsErr(e, "Couldn't join that household. Try again."); }
+}
+async function leaveHousehold(){
+  const { F, db } = store.fb, u = store.user;
+  try {
+    if (store.house && (store.house.members || []).length > 1)
+      await F.updateDoc(F.doc(db, "households", store.hid), { members: F.arrayRemove(u.uid) });
+    await F.setDoc(F.doc(db, "users", u.uid), { householdId: null }, { merge: true });
+    resetState();
+    await connectCloud(u);
+    S.view = "generate"; render(); toast("You left the household and have your own empty plan now.");
+  } catch (e) { fsErr(e, "Couldn't leave the household. Try again."); }
+}
+async function onUserChange(u){
+  if (store.unsub) { store.unsub(); store.unsub = null; }
+  if (store.unsubHouse) { store.unsubHouse(); store.unsubHouse = null; }
+  if (u) { await connectCloud(u); toast("Signed in. Your meals now sync."); }
+  else { store.mode = "local"; store.user = null; store.hid = null; store.house = null; loadLocal(); }
+  S.view = openMeals().length ? "plan" : "generate";
+  render();
+}
+
+/* ---------- Gemini ---------- */
+const gemKey = () => lsGet(LS_GEM) || "";
+const gemModel = () => { const m = (lsGet(LS_MODEL) || "").trim(); return !m || m === "gemini-2.5-flash" || !/^gemini-[\w.-]+$/.test(m) ? "auto" : m; };
+function fileToB64(f){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(f); }); }
+function parseLooseJSON(t){
+  try { return JSON.parse(t); } catch {}
+  const m = t.match(/```(?:json)?\s*([\s\S]*?)```/); if (m) { try { return JSON.parse(m[1]); } catch {} }
+  const a = t.search(/[\[{]/), b = Math.max(t.lastIndexOf("]"), t.lastIndexOf("}"));
+  if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch {} }
+  throw { code: "invalid_json" };
+}
+/* Models tried in order when "Automatic" is chosen. If one is overloaded,
+   rate limited or unavailable to your project, the next one is used. */
+const MODEL_CHAIN = ["gemini-3.8-flash","gemini-3.7-flash","gemini-3.6-flash","gemini-3.5-flash","gemini-3.5-flash-lite","gemini-3.1-flash-lite","gemini-3-flash-preview"];
+let lastModel = "", modelList = null, modelBad = {};
+const FAST_FIRST = ["gemini-3.5-flash-lite","gemini-3.1-flash-lite"];
+const noThink = {};
+function modelOrder(fast = false){
+  const m = gemModel();
+  const list = m === "auto" ? (fast ? FAST_FIRST.filter(x => !modelList || !modelList.length || modelList.includes(x)) : []) : [m];
+  for (const x of (modelList && modelList.length ? [...MODEL_CHAIN.filter(c => modelList.includes(c)), ...MODEL_CHAIN.filter(c => !modelList.includes(c))] : MODEL_CHAIN)) if (!list.includes(x)) list.push(x);
+  // models that failed recently go to the back of the line for 5 minutes
+  const now = Date.now();
+  return [...list.filter(x => !(modelBad[x] > now)), ...list.filter(x => modelBad[x] > now)];
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function callModel(model, body){
+  let res;
+  try {
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": gemKey() }, body
+    });
+  } catch { throw { code: "network", fatal: true }; }
+  let j = null; try { j = await res.json(); } catch {}
+  if (!res.ok) {
+    const msg = j && j.error && j.error.message || "";
+    if (/api key/i.test(msg) || res.status === 401) throw { code: "bad_key", message: msg, fatal: true };
+    if (res.status === 429) throw { code: "rate", message: msg };
+    if (res.status === 503 || res.status === 500 || /overloaded|high demand|unavailable/i.test(msg)) throw { code: "busy", message: msg };
+    if (res.status === 400 && /thinking/i.test(msg)) throw { code: "bad_param", message: msg };
+    if (res.status === 404 || res.status === 403 || /model|not found|not supported|no longer available/i.test(msg)) throw { code: "bad_model", message: msg };
+    throw { code: "upstream", message: msg || ("HTTP " + res.status) };
+  }
+  const cand = j && j.candidates && j.candidates[0];
+  const t = cand ? ((cand.content && cand.content.parts) || []).map(p => p.text || "").join("") : "";
+  if (!t) throw { code: "blocked", fatal: true };
+  return t;
+}
+/* fast: short, low-stakes answers (meal ideas). Asks Gemini to think less and tries the quick Lite models first. */
+async function askJSON(prompt, { images = null, fast = false } = {}){
+  if (!gemKey()) throw { code: "no_key" };
+  const parts = [{ text: prompt }];
+  if (images) for (const f of [].concat(images)) parts.push({ inline_data: { mime_type: f.type || "image/jpeg", data: await fileToB64(f) } });
+  const mk = think => JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.9, ...(think ? { thinkingConfig: { thinkingLevel: "low" } } : {}) } });
+  let lastErr = null;
+  for (const model of modelOrder(fast)) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const think = fast && !noThink[model];
+      try {
+        const t = await callModel(model, mk(think));
+        let out; try { out = parseLooseJSON(t); } catch (e) { if (attempt === 0) continue; throw e; }
+        lastModel = model; delete modelBad[model];
+        const el = document.getElementById("lastModel"); if (el) el.textContent = "Last answer came from " + model + ".";
+        return out;
+      } catch (e) {
+        lastErr = e;
+        if (e.fatal) throw e;
+        if (e.code === "bad_param") { if (think) { noThink[model] = true; continue; } break; }
+        if (e.code === "invalid_json") break;
+        if (e.code === "bad_model") { modelBad[model] = Date.now() + 30 * 60e3; break; }
+        if (e.code === "busy" && attempt === 0) { await sleep(1200); continue; }
+        modelBad[model] = Date.now() + 5 * 60e3; break; // busy twice, or rate limited: try the next model
+      }
+    }
+  }
+  throw lastErr && lastErr.code === "bad_model" ? { code: "no_model", message: lastErr.message } : (lastErr || { code: "upstream" });
+}
+async function loadModels(){
+  if (!gemKey()) return;
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": gemKey() } });
+    if (!res.ok) return;
+    const j = await res.json();
+    modelList = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent"))
+      .map(m => String(m.name || "").replace(/^models\//, ""))
+      .filter(n => /^gemini-/.test(n) && !/tts|image|live|audio|embedding|transcribe|robotics|computer/.test(n))
+      .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+    if (S.view === "generate" && !isEditing()) render();
+  } catch {}
+}
+function aiErr(e){
+  const c = e && e.code;
+  const base = ({
+    no_key: "Add your Gemini API key in Settings (gear button, top right) so the app can write meals.",
+    bad_key: "Gemini rejected the API key. Check it in Settings (gear button, top right).",
+    no_model: "None of the Gemini models are available to your API key. Check the key's project in Google AI Studio." + (e && e.message ? " (" + e.message + ")" : ""),
+    rate: "You've hit Gemini's free-tier limit on every model. Wait a minute, then try again.",
+    busy: "Gemini is overloaded on every model right now. Wait a minute, then try again.",
+    invalid_json: "Gemini's answer came back garbled. Try again.",
+    blocked: "Gemini didn't return an answer. Try rewording your special requests.",
+    network: "Couldn't reach Gemini. Check your connection.",
+    upstream: "Gemini had a problem" + (e && e.message ? ": " + e.message : ". Try again.")
+  })[c];
+  return base || "Something went wrong while writing meals. Try again.";
+}
+
+/* ---------- prompts ---------- */
+function prefsText(){
+  const s = S.settings;
+  const o = OPTIONS.map(x => x[0]).filter(optOn).map(k => OPT_TEXT[k]);
+  return { opts: o.length ? o.join("; ") : "none", req: (s.requests || "").trim() || "none" };
+}
+const typesText = () => S.settings.mealTypes.join(", ");
+
+function normCand(m){
+  const s = S.settings;
+  return {
+    id: uid(), status: "open", name: String(m.name).slice(0, 120), description: String(m.description || "").slice(0, 300),
+    mealType: TYPES.some(t => t[0] === m.mealType) && s.mealTypes.includes(m.mealType) ? m.mealType : s.mealTypes[0],
+    category: CATS.includes(m.category) ? m.category : "Other", cuisine: String(m.cuisine || ""),
+    totalMinutes: num(m.totalMinutes), cost: /^\${1,3}$/.test(m.cost) ? m.cost : "",
+    keyIngredients: Array.isArray(m.keyIngredients) ? m.keyIngredients.slice(0, 6).map(String) : [],
+    sharesWith: Array.isArray(m.sharesWith) ? m.sharesWith.slice(0, 4).map(String) : []
+  };
+}
+/* Meals already chosen or on the list, with their main ingredients, so new ideas can reuse them. */
+function weekContext(){
+  const rows = [
+    ...picked().map(c => [c.name, c.keyIngredients]),
+    ...S.plan.candidates.filter(c => c.favId && c.status !== "picked").map(c => [c.name, c.keyIngredients]),
+    ...openMeals().map(r => [r.name, r.ingredients.map(i => i.item).slice(0, 8)])
+  ];
+  return rows.map(([n, ing]) => `${n}${ing && ing.length ? " (" + ing.join(", ") + ")" : ""}`).slice(0, 20);
+}
+/* Favorites to mix into a new list: right meal type, not already planned or listed, least recently made first. */
+function favoriteCandidates(k){
+  if (k <= 0) return [];
+  const s = S.settings, listed = new Set(S.plan.candidates.map(c => c.favId).filter(Boolean));
+  const rej = new Set(S.plan.rejected.map(x => x.toLowerCase()));
+  const pool = recipesArr().filter(r => r.favorite && !r.inPlan && !r.pending && !listed.has(r.id) && s.mealTypes.includes(r.mealType) && !rej.has(r.name.toLowerCase()) && r.ingredients && r.ingredients.length)
+    .map(r => [r, (r.doneAt || r.addedAt || r.createdAt || 0) + Math.random() * 864e5])
+    .sort((a, b) => a[1] - b[1]).slice(0, k).map(x => x[0]);
+  return pool.map(r => ({
+    id: uid(), status: "open", favId: r.id, name: r.name, description: r.description || "One of your favorites.",
+    mealType: r.mealType, category: r.category, cuisine: r.cuisine || "", cost: r.cost || "",
+    totalMinutes: num(r.totalMinutes) ?? (((r.prepMinutes || 0) + (r.cookMinutes || 0)) || null),
+    keyIngredients: r.ingredients.slice(0, 5).map(i => i.item), sharesWith: []
+  }));
+}
+const BATCH_LEAN = ["chicken, turkey, vegetarian and seafood mains", "beef, pork, pasta, soups and grain bowls"];
+async function fetchIdeas(n, exclude, { batch = 0, of = 1 } = {}){
+  const s = S.settings, p = prefsText();
+  const favs = recipesArr().filter(r => r.favorite).map(r => r.name).slice(0, 15);
+  const week = weekContext(), lw = lowWaste();
+  const prompt =
+`You are planning home-cooked meals for a household of ${s.people} people.
+Suggest exactly ${n} different meal ideas. Meal types to cover: ${typesText()}${s.mealTypes.length > 1 ? " (spread them roughly evenly)" : ""}.
+Household preferences: ${p.opts}.
+Special requests (follow strictly; treat any allergy as a hard rule and avoid cross-contact ingredients): ${p.req}.
+${favs.length ? "Meals this household rated highly (taste reference only, do not repeat them): " + favs.join("; ") + ".\n" : ""}${exclude.length ? "Do not suggest any of these or close variations: " + exclude.join("; ") + ".\n" : ""}${week.length ? "Meals already chosen or on the list for this week: " + week.join("; ") + ".\n" : ""}${lw ? "Food waste matters to this household: favor ideas that reuse perishable ingredients from the meals above and from each other (the same fresh herbs, vegetables, dairy or protein), so nothing is bought for a single use and left to spoil.\n" : ""}${of > 1 ? `This is batch ${batch} of ${of} requested at the same time. To avoid overlap with the other batch, lean toward ${BATCH_LEAN[(batch - 1) % 2]}, unless the special requests say otherwise.\n` : ""}Vary proteins, cuisines and cooking methods.
+Reply with only a JSON array of ${n} objects shaped like:
+{"name":"Sheet-Pan Lemon Herb Chicken","description":"One appetizing sentence.","mealType":"dinner","category":"Chicken","cuisine":"Mediterranean","totalMinutes":40,"cost":"$","keyIngredients":["chicken thighs","baby potatoes","lemon"]${lw ? ',"sharesWith":["lemon","parsley"]' : ""}}${lw ? "\nsharesWith lists the perishable ingredients this idea shares with the meals above or with other ideas in your list (empty if none)." : ""}
+mealType is one of: ${typesText()}. category is one of: ${CATS.join(", ")}. cost is "$" (cheap), "$$" or "$$$".`;
+  let arr = await askJSON(prompt, { fast: true });
+  if (!Array.isArray(arr)) arr = arr && (arr.meals || arr.ideas || arr.suggestions) || [];
+  return Array.isArray(arr) ? arr.filter(m => m && m.name) : [];
+}
+/* Adds exactly n new ideas when possible (asks again once if Gemini repeats itself). */
+async function suggest(n, { fresh = false, withFavorites = false } = {}){
+  if (S.busy) return;
+  if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  S.busy = { kind: "suggest", label: `Finding ${n} meal ideas`, sub: "This usually takes a few seconds." }; render();
+  try {
+    if (fresh) { S.plan.rejected = [...S.plan.rejected, ...S.plan.candidates.filter(c => c.status !== "picked" && !c.favId && !c.pickedAt).map(c => c.name)].slice(-200); S.plan.candidates = picked(); }
+    const favs = withFavorites ? favoriteCandidates(Math.min(S.settings.favorites ?? 1, n - 1)) : [];
+    S.plan.candidates = [...S.plan.candidates, ...favs];
+    n -= favs.length;
+    const keep = S.plan.candidates;
+    const exclude = () => [...new Set([...S.plan.candidates.map(c => c.name), ...S.plan.rejected, ...planRecipes().map(r => r.name)])].slice(-150);
+    const seen = new Set(exclude().map(x => x.toLowerCase()));
+    const added = [];
+    for (let attempt = 0; attempt < 2 && added.length < n; attempt++) {
+      const want = n - added.length;
+      const ex = [...exclude(), ...added.map(a => a.name)];
+      // 6 or more ideas: ask for two halves at once, which comes back about twice as fast
+      const sizes = want >= 6 ? [Math.ceil(want / 2) + 1, Math.floor(want / 2) + 1] : [want + (attempt ? 2 : 1)];
+      const res = await Promise.allSettled(sizes.map((k, i) => fetchIdeas(k, ex, { batch: i + 1, of: sizes.length })));
+      if (res.every(r => r.status === "rejected")) throw res[0].reason;
+      const got = res.flatMap(r => r.status === "fulfilled" ? r.value : []);
+      for (const m of got) {
+        const k = String(m.name).toLowerCase().trim();
+        if (seen.has(k) || added.length >= n) continue;
+        seen.add(k); added.push(normCand(m));
+      }
+    }
+    S.plan.candidates = [...keep, ...added];
+    syncCandidates();
+    if (!added.length && n > 0) toast("No new ideas came back. Try again or loosen your requests.");
+    else if (added.length < n) toast(`Only ${added.length} new ideas came back.`);
+    persist("plan");
+  } catch (e) { console.error(e); toast(aiErr(e)); }
+  S.busy = null; render();
+}
+
+function normRecipe(o, c){
+  const people = S.settings.people;
+  return {
+    id: uid(), name: String(o && o.name || c.name), description: c.description || "", mealType: c.mealType, category: c.category,
+    cuisine: c.cuisine || "", cost: c.cost || "", servings: num(o && o.servings, people) || people,
+    prepMinutes: num(o && o.prepMinutes), cookMinutes: num(o && o.cookMinutes),
+    ingredients: (Array.isArray(o && o.ingredients) ? o.ingredients : []).map(i => typeof i === "string" ? { item: i, quantity: null, unit: "", note: "" } :
+      { item: String(i.item || i.name || ""), quantity: num(i.quantity), unit: String(i.unit || ""), note: String(i.note || "") }).filter(i => i.item),
+    steps: (Array.isArray(o && o.steps) ? o.steps : []).map(x => typeof x === "string" ? x : (x && (x.text || x.step)) || "").filter(Boolean),
+    tips: String(o && o.tips || ""), source: "ai", rating: 0, favorite: false, done: false, inPlan: true,
+    addedAt: Date.now(), createdAt: Date.now()
+  };
+}
+async function writeRecipes(group, week = []){
+  const s = S.settings, p = prefsText(), lw = lowWaste();
+  const others = week.filter(w => !group.some(g => w.startsWith(g.name)));
+  const prompt =
+`Write complete, reliable home recipes for the meals below. Each recipe must serve ${s.people} people.
+Household preferences: ${p.opts}.
+Special requests (follow strictly; allergies are hard rules): ${p.req}.
+Meals:
+${group.map((c, i) => `${i + 1}. ${c.name}: ${c.description} (${c.mealType}, ${c.category})`).join("\n")}
+${others.length ? "These will be cooked in the same week as: " + others.join("; ") + ".\n" : ""}${lw ? "Minimize food waste across the week: where it fits naturally, use the same perishable ingredients as the other meals (the same fresh herb, vegetable, cheese or package of tortillas) and size amounts so whole packages get used (a whole bunch, a whole can, a whole bell pepper) instead of leaving small remainders. In tips, say how to use any remainder.\n" : ""}Reply with only a JSON array with one object per meal, in the same order, shaped like:
+{"name":"...","servings":${s.people},"prepMinutes":15,"cookMinutes":30,"ingredients":[{"item":"boneless skinless chicken thighs","quantity":2,"unit":"lb","note":"trimmed"}],"steps":["Heat the oven to 425°F.","..."],"tips":"One short tip or make-ahead note."}
+Use US measurements. quantity is a number (decimals like 0.5 are fine) or null for "to taste". Steps are full sentences in cooking order.`;
+  let arr = await askJSON(prompt);
+  if (!Array.isArray(arr)) arr = arr && arr.recipes || [];
+  return group.map((c, i) => {
+    const o = arr.find(x => x && x.name && x.name.toLowerCase() === c.name.toLowerCase()) || arr[i];
+    return o && Array.isArray(o.ingredients) && o.ingredients.length ? normRecipe(o, c) : null;
+  });
+}
+/* Fill a placeholder recipe with what Gemini wrote, keeping its id and plan status. */
+function fillRecipe(r, o){
+  const n = normRecipe(o, r);
+  Object.assign(r, { name: n.name, servings: n.servings, prepMinutes: n.prepMinutes, cookMinutes: n.cookMinutes, ingredients: n.ingredients, steps: n.steps, tips: n.tips, pending: false, writeFailed: false });
+  delete r.pendingSince;
+}
+function newPlaceholder(c){
+  return { id: uid(), name: c.name, description: c.description || "", mealType: c.mealType, category: c.category, cuisine: c.cuisine || "", cost: c.cost || "",
+    totalMinutes: c.totalMinutes ?? null, servings: S.settings.people, prepMinutes: null, cookMinutes: null, ingredients: [], steps: [], tips: "",
+    keyIngredients: c.keyIngredients || [], source: "ai", rating: 0, favorite: false, done: false, inPlan: true,
+    pending: true, pendingSince: Date.now(), addedAt: Date.now(), createdAt: Date.now() };
+}
+const writer = { timer: null, inFlight: new Set(), workers: 0 };
+function queueWrites(delay = 900){ clearTimeout(writer.timer); writer.timer = setTimeout(runWrites, delay); }
+function weekList(){ return planRecipes().map(r => r.name + ((r.keyIngredients && r.keyIngredients.length) ? " (" + r.keyIngredients.join(", ") + ")" : r.ingredients.length ? " (" + r.ingredients.slice(0, 6).map(i => i.item).join(", ") + ")" : "")); }
+async function runWrites(){
+  if (!gemKey()) return;
+  while (writer.workers < 2) {
+    const todo = recipesArr().filter(r => r.pending && r.inPlan && !writer.inFlight.has(r.id));
+    if (!todo.length) return;
+    const group = todo.slice(0, 2);
+    group.forEach(r => writer.inFlight.add(r.id));
+    writer.workers++;
+    (async () => {
+      try {
+        const out = await writeRecipes(group, weekList());
+        out.forEach((o, i) => {
+          const r = S.recipes[group[i].id];
+          if (!r || !r.pending) return;                       // unpicked while writing
+          if (o) fillRecipe(r, o); else { r.pending = false; r.writeFailed = true; }
+          saveRecipe(r);
+        });
+      } catch (e) {
+        console.error(e);
+        group.forEach(g => { const r = S.recipes[g.id]; if (r && r.pending) { r.pending = false; r.writeFailed = true; saveRecipe(r); } });
+        toast(aiErr(e));
+      } finally {
+        group.forEach(r => writer.inFlight.delete(r.id));
+        writer.workers--;
+        if (!isEditing()) render();
+        runWrites();
+      }
+    })();
+  }
+}
+/* Recipes left half-written (page closed mid-write) get picked up again. */
+function resumeWrites(){
+  const stale = recipesArr().filter(r => r.pending && r.inPlan && (Date.now() - (r.pendingSince || 0) > 90e3));
+  stale.forEach(r => { r.pendingSince = Date.now(); });
+  if (stale.length) queueWrites(300);
+}
+function pickCandidate(c){
+  const s = S.settings;
+  if (weekCount() >= s.meals) { toast(`This week already has ${s.meals} meal${s.meals > 1 ? "s" : ""}. Undo one or raise "Meals to plan" in Plan settings.`); return; }
+  if (!gemKey() && !(c.favId && S.recipes[c.favId])) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  let r = c.favId && S.recipes[c.favId];
+  if (r) { r.inPlan = true; r.done = false; r.addedAt = Date.now(); }
+  else { r = newPlaceholder(c); queueWrites(); }
+  saveRecipe(r);
+  c.status = "picked"; c.recipeId = r.id; c.pickedAt = Date.now();
+  persist("plan");
+}
+function unpickCandidate(c){
+  const r = S.recipes[c.recipeId];
+  if (r) {
+    if (!c.favId && r.source === "ai" && !r.favorite && !r.rating) { delete S.recipes[r.id]; persist("r-" + r.id); }
+    else { r.inPlan = false; saveRecipe(r); }
+  }
+  c.status = "open"; delete c.recipeId;
+  persist("plan");
+}
+/* Keep suggestion cards in step when a meal leaves the plan some other way. */
+function syncCandidates(){
+  let changed = false;
+  for (const c of S.plan.candidates) {
+    const fr = c.favId && S.recipes[c.favId];
+    if (fr && fr.inPlan && c.status !== "picked") { c.status = "picked"; c.recipeId = fr.id; c.pickedAt = Date.now(); changed = true; continue; }
+    if (c.status !== "picked") continue;
+    const r = S.recipes[c.recipeId];
+    // a just-picked meal's recipe may still be on its way from another device
+    const gone = !c.recipeId || (!r && Date.now() - (c.pickedAt || 0) > 30e3) || (r && !r.inPlan);
+    if (gone) { c.status = "open"; delete c.recipeId; c.drop = !!(r && r.doneAt); changed = true; }
+  }
+  // meals that were made and cleared leave the idea list
+  if (S.plan.candidates.some(c => c.drop)) { S.plan.candidates = S.plan.candidates.filter(c => !c.drop); changed = true; }
+  if (changed) persist("plan");
+}
+/* One-time: recipes the household typed or uploaded count as favorites. */
+function migrateOnce(){
+  if (S.settings.favMigrated) return;
+  recipesArr().filter(r => r.source !== "ai" && !r.favorite).forEach(r => { r.favorite = true; saveRecipe(r); });
+  S.settings.favMigrated = true; persist("settings");
+}
+async function buildPlan(){
+  if (S.busy) return;
+  const all = picked();
+  if (!all.length) return;
+  let done = 0, failed = 0, firstErr = null, gi = 0;
+  // favorites already have a recipe: put them straight into the plan
+  for (const c of all.filter(c => c.favId)) {
+    const r = S.recipes[c.favId];
+    if (r) { r.inPlan = true; r.done = false; r.addedAt = Date.now(); saveRecipe(r); S.plan.candidates = S.plan.candidates.filter(x => x.id !== c.id); done++; }
+  }
+  const list = all.filter(c => !c.favId || !S.recipes[c.favId]);
+  const week = [...all.map(c => c.name + (c.keyIngredients.length ? " (" + c.keyIngredients.join(", ") + ")" : "")), ...openMeals().filter(r => !all.some(c => c.favId === r.id)).map(r => r.name)];
+  const groups = []; for (let i = 0; i < list.length; i += 2) groups.push(list.slice(i, i + 2));
+  const tick = () => { S.busy = { kind: "build", label: `Writing recipes (${done} of ${all.length})`, sub: "Full recipes take up to a minute. Keep this page open." }; render(); };
+  tick();
+  async function worker(){
+    while (gi < groups.length){
+      const g = groups[gi++];
+      try {
+        const out = await writeRecipes(g, week);
+        out.forEach((r, i) => {
+          if (r){ saveRecipe(r); S.plan.candidates = S.plan.candidates.filter(c => c.id !== g[i].id); done++; }
+          else failed++;
+        });
+      } catch (e) { console.error(e); failed += g.length; firstErr = firstErr || e; }
+      persist("plan"); tick();
+    }
+  }
+  await Promise.all([worker(), worker()]);
+  if (!failed) { S.plan.candidates = []; S.plan.rejected = []; persist("plan"); }
+  S.busy = null;
+  if (failed) toast(firstErr ? aiErr(firstErr) : `${failed} recipe${failed > 1 ? "s" : ""} didn't come back. Tap Build again for the rest.`);
+  if (done) { await buildShopping(); S.view = "plan"; window.scrollTo(0, 0); if (!failed) toast("Your meals and shopping list are ready."); }
+  render();
+}
+
+const shopIds = () => openMeals().map(r => r.id).sort().join(",");
+function localShopping(recipes){
+  const m = new Map();
+  recipes.forEach(r => r.ingredients.forEach(i => {
+    const k = i.item.toLowerCase().trim(); const e = m.get(k) || { item: i.item, q: [], meals: new Set() };
+    const a = ingAmount(i); if (a) e.q.push(a); e.meals.add(r.name); m.set(k, e);
+  }));
+  return [...m.values()].map(e => ({ section: "Other", item: e.item, quantity: e.q.join(" + "), meals: [...e.meals], pantry: false, got: false }));
+}
+async function buildShopping(){
+  const recipes = openMeals();
+  if (!recipes.length) { S.plan.shopping = null; persist("shopping"); return; }
+  S.busy = { kind: "shop", label: "Building your shopping list", sub: "Combining ingredients across meals." }; render();
+  const prompt =
+`Make one combined grocery shopping list for these recipes. Add up the same ingredient across recipes and turn amounts into what a shopper buys (for example "2 lb", "1 bunch", "1 (14 oz) can", "3 medium").
+${recipes.map(r => "## " + r.name + "\n" + r.ingredients.map(i => "- " + ingText(i)).join("\n")).join("\n\n")}
+
+${lowWaste() ? `Buy the smallest amounts that cover the recipes, in sizes stores actually sell.
+Reply with only a JSON object shaped like:
+{"items":[{"section":"Produce","item":"Fresh cilantro","quantity":"1 bunch","meals":["Exact recipe name"],"pantry":false,"leftover":"about 1/2 bunch"}],"useItUp":["Stir the leftover cilantro into Thursday's rice or freeze it chopped in oil."]}
+leftover is what will remain after cooking every recipe, only for perishable items (fresh produce, herbs, dairy, meat, bread, opened cans); use "" when little or nothing is left. useItUp has up to 4 short, practical ideas for using those leftovers.` : `Reply with only a JSON array of objects shaped like:
+{"section":"Produce","item":"Yellow onions","quantity":"3 medium","meals":["Exact recipe name"],"pantry":false}`}
+section is one of: ${SECTIONS.join(", ")}. Set pantry to true for staples most kitchens already have (salt, pepper, cooking oil, flour, sugar, common dried spices).`;
+  let items, useItUp = [];
+  try {
+    const out = await askJSON(prompt);
+    let arr = Array.isArray(out) ? out : (out && out.items) || [];
+    if (out && Array.isArray(out.useItUp)) useItUp = out.useItUp.map(String).filter(Boolean).slice(0, 4);
+    items = arr.filter(x => x && x.item).map(x => ({ section: SECTIONS.includes(x.section) ? x.section : "Other", item: String(x.item), quantity: String(x.quantity || ""),
+      meals: Array.isArray(x.meals) ? x.meals.map(String) : [], pantry: !!x.pantry, got: false, leftover: String(x.leftover || "").trim() }));
+    if (!items.length) throw { code: "invalid_json" };
+  } catch (e) {
+    console.error(e);
+    items = localShopping(recipes);
+    toast("Couldn't sort the list by aisle, so here's a plain combined list.");
+  }
+  S.plan.shopping = { items, useItUp, builtFor: shopIds(), at: Date.now() }; persist("shopping");
+  S.busy = null;
+}
+
+async function readPhoto(){
+  const photos = (S.sheet && S.sheet.photos) || []; if (!photos.length || S.busy) return;
+  if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  const many = photos.length > 1;
+  const prompt =
+`${many ? `These ${photos.length} images are parts of ONE recipe (for example the front and back of a recipe card, or two cookbook pages). Read all of them and combine them into a single recipe, keeping ingredients and steps in the right order.` : "This image shows a recipe (a cookbook page, recipe card, handwritten note or screenshot). Transcribe it."}
+Reply with only a JSON object shaped like:
+{"name":"...","category":"Chicken","mealType":"dinner","servings":4,"prepMinutes":15,"cookMinutes":30,"ingredients":["2 lb chicken thighs","1 tsp salt"],"steps":["First step.","Second step."],"tips":""}
+category is one of: ${CATS.join(", ")}. mealType is breakfast, lunch or dinner. Leave out anything you can't read; use null for unknown numbers.`;
+  S.busy = { kind: "photo", label: many ? `Reading ${photos.length} photos` : "Reading the recipe photo", sub: "This can take up to a minute." }; renderSheet();
+  try {
+    const o = await askJSON(prompt, { images: photos.map(p => p.file) });
+    const d = S.sheet.draft;
+    d.name = o.name || d.name; d.category = CATS.includes(o.category) ? o.category : d.category;
+    d.mealType = TYPES.some(t => t[0] === o.mealType) ? o.mealType : d.mealType;
+    d.servings = num(o.servings, d.servings) || d.servings; d.prepMinutes = num(o.prepMinutes, "") ?? ""; d.cookMinutes = num(o.cookMinutes, "") ?? "";
+    d.ingredients = (o.ingredients || []).map(i => typeof i === "string" ? i : ingText(i)).join("\n");
+    d.steps = (o.steps || []).map(x => typeof x === "string" ? x : (x && (x.text || x.step)) || "").join("\n"); d.tips = o.tips || "";
+    toast("Recipe filled in. Check it over, then save.");
+  } catch (e) { toast(aiErr(e)); }
+  S.busy = null; renderSheet();
+}
+
+/* ---------- shopping list: items you add yourself ---------- */
+const SECTION_WORDS = [
+  ["Produce", /\b(apple|banana|berr|lettuce|spinach|kale|onion|garlic|potato|tomato|pepper|carrot|celery|cucumber|avocado|lemon|lime|orange|grape|melon|broccoli|cauliflower|zucchini|squash|mushroom|cilantro|parsley|basil|herb|ginger|scallion|salad|fruit|veg|cabbage|corn on)/i],
+  ["Meat & Seafood", /\b(chicken|beef|pork|steak|ground|turkey|bacon|sausage|ham|salmon|shrimp|fish|tuna|cod|tilapia|lamb|ribs?)\b/i],
+  ["Dairy & Eggs", /\b(milk|cheese|butter|yogurt|yoghurt|cream|eggs?|sour cream|half and half|creamer)\b/i],
+  ["Bakery", /\b(bread|bun|bagel|tortilla|roll|muffin|croissant|pita|naan)s?\b/i],
+  ["Frozen", /\b(frozen|ice cream|popsicle)\b/i],
+  ["Spices & Condiments", /\b(salt|pepper flakes|spice|seasoning|ketchup|mustard|mayo|sauce|vinegar|dressing|cumin|paprika|oregano|cinnamon|syrup|honey)\b/i],
+  ["Pantry", /\b(rice|pasta|noodle|flour|sugar|oil|beans|can|canned|cereal|oats|broth|stock|coffee|tea|chips|crackers|snack|peanut butter|jam|nuts)\b/i]
+];
+const guessSection = name => (SECTION_WORDS.find(([, re]) => re.test(name)) || ["Other"])[0];
+function parsePasted(text){
+  let lines = String(text || "").split(/\r?\n/);
+  if (lines.filter(l => l.trim()).length === 1 && lines.join("").includes(",")) lines = lines.join("").split(",");
+  const out = [], seen = new Set(S.extras.map(x => x.item.toLowerCase()));
+  for (let l of lines) {
+    l = l.replace(/^[\s\-–—•*·◦▪▫●○☐☑✓✔✗□■>]+/, "").replace(/^\d+[.)]\s+/, "").replace(/\s+/g, " ").trim();
+    if (!l || l.length > 120) continue;
+    if (/^(shopping( list)?|to-?do( list)?|completed( items)?|items?|list|uncheck(ed)?|checked)$/i.test(l)) continue;
+    const k = l.toLowerCase(); if (seen.has(k)) continue; seen.add(k);
+    out.push(l);
+  }
+  return out;
+}
+async function addExtras(text){
+  const names = parsePasted(text);
+  if (!names.length) { toast("Nothing to add. Paste or type items, one per line."); return 0; }
+  const added = names.map(n => ({ id: uid(), item: n, quantity: "", section: guessSection(n), got: false, added: true }));
+  S.extras = [...S.extras, ...added]; persist("extras"); render();
+  toast(`Added ${added.length} item${added.length > 1 ? "s" : ""} to the list.`);
+  if (!gemKey()) return added.length;
+  // tidy names, pull out quantities and sort into store sections in the background
+  try {
+    const out = await askJSON(`Sort these grocery list items into store sections and split out any quantity.
+${added.map((x, i) => `${i + 1}. ${x.item}`).join("\n")}
+Reply with only a JSON array with one object per item, in the same order, shaped like:
+{"item":"Bananas","quantity":"1 bunch","section":"Produce"}
+Keep the item's meaning; fix only capitalization and obvious typos. quantity is "" when none was given. section is one of: ${SECTIONS.join(", ")}.`, { fast: true });
+    if (Array.isArray(out)) {
+      added.forEach((x, i) => {
+        const o = out[i]; const cur = S.extras.find(e => e.id === x.id);
+        if (!o || !cur) return;
+        if (o.item) cur.item = String(o.item).slice(0, 120);
+        cur.quantity = String(o.quantity || "");
+        if (SECTIONS.includes(o.section)) cur.section = o.section;
+      });
+      persist("extras"); if (S.view === "shopping" && !isEditing()) render();
+    }
+  } catch (e) { console.error(e); }
+  return added.length;
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 4500); }
+
+/* ---------- render: shell ---------- */
+function render(){
+  const n = openMeals().length;
+  const shopLeft = shopRows().filter(i => !i.got && !i.pantry).length;
+  const tabs = [["plan","Meal plan",IC.plan,n],["generate","Suggest",IC.gen,0],["shopping","Shopping",IC.shop,shopLeft],["recipes","Recipes",IC.box,0]];
+  document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
+    `<button class="tab" data-action="go" data-v="${k}" ${S.view === k ? 'aria-current="page"' : ""}>${ic}<span>${l}</span>${b ? `<span class="badge">${b}</span>` : ""}</button>`).join("");
+  const d = new Date(); d.setDate(d.getDate() - d.getDay());
+  document.getElementById("wk").textContent = "Week of " + d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  document.getElementById("acct").innerHTML = gearBtn();
+  if (!S.loaded) return;
+  document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : vGenerate());
+  renderSheet();
+}
+function needsAttention(){ return !gemKey() || !!store.fbError || (!!store.fb && !store.user); }
+function gearBtn(){
+  return `<button class="gear" data-action="settings" aria-label="Settings">${IC.gear}${needsAttention() ? '<span class="gdot warn" aria-hidden="true"></span>' : store.user ? '<span class="gdot" aria-hidden="true"></span>' : ""}</button>`;
+}
+function openSettings(){ S.sheet = { type: "settings" }; renderSheet(); }
+/* ---------- install as an app ---------- */
+let installPrompt = null;
+const isInstalled = () => { try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch { return false; } };
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; if (S.sheet && S.sheet.type === "settings") renderSheet(); });
+window.addEventListener("appinstalled", () => { installPrompt = null; toast("Mealboard is installed. Open it from your home screen."); if (S.sheet && S.sheet.type === "settings") renderSheet(); });
+if ("serviceWorker" in navigator && window.isSecureContext) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker not registered", e)));
+function installBox(){
+  if (isInstalled()) return `<section class="setsec"><h3>App</h3><p class="hint">Mealboard is installed on this device.</p></section>`;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  return `<section class="setsec"><h3>Install as an app</h3>
+    ${installPrompt ? `<div class="row"><button class="btn small primary" data-action="install">${IC.plus}Install Mealboard</button><span class="hint">Adds an icon to your home screen and opens full screen.</span></div>`
+      : ios ? `<p class="hint">On iPhone or iPad: tap the Share button in Safari, then <strong>Add to Home Screen</strong>.</p>`
+      : `<p class="hint">In Chrome, open the ⋮ menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>. If you don't see it yet, reload the page once.</p>`}
+  </section>`;
+}
+function acctBtn(){
+  if (!store.fb) return "";
+  if (!store.user) return `<button class="acct" data-action="signin">Sign in to sync</button>`;
+  const nm = store.user.displayName || store.user.email || "You";
+  return S.armed === "signout" ? `<button class="acct armed" data-action="signout">Tap to sign out</button>`
+    : `<button class="acct" data-action="signout" title="${esc(nm)}"><span class="av">${esc(nm[0].toUpperCase())}</span><span class="dot" aria-hidden="true"></span>Synced</button>`;
+}
+const busyBox = () => S.busy ? `<div class="busy" role="status"><span class="spin"></span><div>${esc(S.busy.label)}…<small>${esc(S.busy.sub || "")}</small></div></div>` : "";
+const catLabel = c => `<span class="catdot" style="--h:${HUE[c] ?? 260}"></span>${esc(c)}`;
+function minsOf(r){ const t = r.totalMinutes ?? ((r.prepMinutes || 0) + (r.cookMinutes || 0)); return t ? `${t} min` : ""; }
+const starsMini = n => n ? `<span class="stars-mini" aria-label="${n} of 5 stars">${IC.star.repeat(n)}</span>` : "";
+
+/* ---------- view: plan ---------- */
+function vPlan(){
+  const all = planRecipes(), open = all.filter(r => !r.done), done = all.filter(r => r.done);
+  const pend = pendingRecipes().length, sh = S.plan.shopping, fresh = sh && sh.builtFor === shopIds();
+  const shopBtn = !open.length ? "" : pend
+    ? `<button class="btn small" disabled><span class="spin"></span>Writing ${pend} recipe${pend > 1 ? "s" : ""}…</button>`
+    : fresh ? `<button class="btn small" data-action="go" data-v="shopping">${IC.shop}View shopping list</button>`
+    : `<button class="btn small primary" data-action="buildshop">${IC.shop}${sh ? "Update shopping list" : "Build shopping list"}</button>`;
+  const head = `<div class="view-head"><div><h2>This week's meals</h2><p>${all.length ? `${open.length} to make · ${done.length} done · ${all.length} of ${S.settings.meals} planned` : "Nothing planned yet."}</p></div>
+    <div class="row">${shopBtn}${done.length ? `<button class="btn small ${S.armed === "clear" ? "armed" : ""}" data-action="clear-done">${S.armed === "clear" ? "Tap again to clear" : "Clear finished meals"}</button>` : ""}
+    <button class="btn small ${open.length ? "" : "primary"}" data-action="go" data-v="generate">${IC.plus}Add meals</button></div></div>`;
+  if (!all.length) return head + `<div class="empty"><h3>No meals planned</h3><p>Get suggestions, pick the ones you like, and they'll show up here with a shopping list.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
+  return head + busyBox() + `<div class="tiles">${all.map(r => tile(r, { check: true })).join("")}</div>`;
+}
+/* check: show the "made it" circle (Meal Plan page only) */
+function tile(r, { check = false } = {}){
+  const state = r.pending ? `<span class="writing"><span class="spin"></span>Writing the recipe…</span>`
+    : r.writeFailed ? `<span class="writing failed">Couldn't write the recipe. Tap to try again.</span>` : "";
+  return `<article class="tile ${r.done ? "done" : ""} ${check ? "" : "nocheck"}" data-rid="${r.id}">
+    <button class="tile-open" data-action="${r.writeFailed ? "retrywrite" : "open"}" data-id="${r.id}">
+      <span class="eyebrow">${catLabel(r.category)} · ${esc(cap(r.mealType))}</span>
+      <h3>${esc(r.name)}</h3>
+      ${state}
+      <span class="meta">${minsOf(r) ? `<span>${minsOf(r)}</span>` : ""}<span>Serves ${r.servings}</span>${r.cost ? `<span class="cost">${esc(r.cost)}</span>` : ""}${starsMini(r.rating)}${r.favorite ? `<span class="fav" aria-label="Favorite">${IC.heart}</span>` : ""}</span>
+    </button>
+    ${check && r.inPlan && !r.pending ? `<button class="tile-check" data-action="toggle-done" data-id="${r.id}" aria-label="${r.done ? "Mark not done" : "Mark done"}: ${esc(r.name)}" aria-pressed="${r.done}">${IC.check}</button>` : ""}
+  </article>`;
+}
+
+/* ---------- view: generate ---------- */
+function stepper(field, val, min, max){
+  return `<div class="stepper"><button data-action="step" data-f="${field}" data-d="-1" ${val <= min ? "disabled" : ""} aria-label="Fewer">−</button><output aria-live="polite">${val}</output><button data-action="step" data-f="${field}" data-d="1" ${val >= max ? "disabled" : ""} aria-label="More">+</button></div>`;
+}
+function vGenerate(){
+  const s = S.settings, c = S.plan.candidates, pk = weekCount(), need = s.meals, n0 = initialCount();
+  const typesTxt = s.mealTypes.map(cap).join(" + ").toLowerCase();
+  const hasList = c.length > 0;
+  const controls = `<div class="panel controls">
+    <details class="fold" id="fold-settings" ${S.open.settings ? "open" : ""}>
+      <summary><span><span class="t">Plan settings</span><span class="s">${need} ${esc(typesTxt)} meal${need > 1 ? "s" : ""} · ${s.people} people${(s.favorites ?? 1) ? ` · ${s.favorites ?? 1} favorite${(s.favorites ?? 1) > 1 ? "s" : ""}` : ""}</span></span>${IC.chev}</summary>
+      <div class="inner">
+        <div class="grid2">
+          <div class="field"><span class="lbl">Meals to plan</span>${stepper("meals", s.meals, 1, 28)}</div>
+          <div class="field"><span class="lbl">People to feed</span>${stepper("people", s.people, 1, 16)}</div>
+        </div>
+        <div class="field"><span class="lbl">Favorites in each new list</span>${stepper("favorites", s.favorites ?? 1, 0, 5)}<span class="hint">Picked from your recipe box automatically, least recently made first.</span></div>
+        <div class="field"><span class="lbl">Meal types</span><div class="chips">${TYPES.map(([k, l]) => `<button class="chip" data-action="type" data-v="${k}" aria-pressed="${s.mealTypes.includes(k)}">${l}</button>`).join("")}</div></div>
+      </div>
+    </details>
+    <div class="field"><span class="lbl">Options</span><div class="chips">${OPTIONS.map(([k, l]) => `<button class="chip" data-action="opt" data-v="${k}" aria-pressed="${optOn(k)}">${l}</button>`).join("")}</div></div>
+    <div class="field reqrow"><label for="req">Special requests</label><input type="text" id="req" data-bind="requests" value="${esc(s.requests)}" placeholder="Include salmon, hazelnut allergy" autocomplete="off" enterkeyhint="go"></div>
+    <button class="btn primary genbtn" data-action="generate" ${S.busy ? "disabled" : ""}>${IC.gen}${hasList ? `Generate a fresh ${n0}` : `Generate ${n0} meals`}</button>
+    ${hasList ? `<span class="hint" style="margin-top:-8px">A fresh list keeps the meals you've picked.</span>` : ""}
+  </div>`;
+
+  let right;
+  if (!hasList){
+    right = busyBox() || `<div class="empty"><h3>Ready when you are</h3><p>Tap Generate for ${n0} ${esc(typesTxt)} ideas for ${s.people} people. ${pk ? `You have ${pk} of ${need} meals planned already. ` : ""}Pick ${need - pk > 0 ? need - pk : need}, pass on the rest, and add 5 more anytime.</p></div>`;
+  } else {
+    const full = pk >= need;
+    const fromBox = planRecipes().filter(r => !c.some(x => x.recipeId === r.id)).length;
+    right = `<div class="spread" style="margin-bottom:14px"><div class="progress"><strong>Picked ${pk} of ${need}</strong><span class="pips">${Array.from({ length: need }, (_, i) => `<span class="pip ${i < pk ? "on" : ""}"></span>`).join("")}</span></div>
+      <span class="muted" style="font-size:.88rem">${c.length} idea${c.length === 1 ? "" : "s"}</span></div>
+      ${fromBox ? `<p class="fullnote">Includes ${fromBox} meal${fromBox > 1 ? "s" : ""} already in your plan.</p>` : ""}
+      ${full ? `<p class="fullnote">You've picked all ${need}. Tap "Picked · undo" on one to swap it.</p>` : ""}
+      <div class="cands">${c.map(cand).join("")}</div>
+      <div class="row" style="margin-top:14px">${busyBox() || `<button class="btn" data-action="more">${IC.plus}Suggest 5 more</button>`}</div>
+      ${pk ? `<div class="buildbar"><div><strong>${full ? "All picked." : `${pk} of ${need} picked`}</strong> <span class="muted">${pendingRecipes().length ? "Recipes are being written." : "Already on your Meal Plan."}</span></div>
+        <button class="btn primary" data-action="go" data-v="plan">${IC.plan}View meal plan</button></div>` : ""}`;
+  }
+  return `<div class="view-head"><div><h2>Suggest meals</h2><p>Pick the ones you want, pass on the rest.</p></div></div><div class="gen"><div class="settings">${controls}</div><section id="cands">${right}</section></div>`;
+}
+function cand(c){
+  const isP = c.status === "picked", full = weekCount() >= S.settings.meals;
+  return `<article class="cand ${isP ? "picked" : ""}" data-cid="${c.id}">
+    <span class="eyebrow" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">${catLabel(c.category)} · ${esc(cap(c.mealType))}${c.favId ? `<span class="favbadge">${IC.heart}Your favorite</span>` : ""}</span>
+    <h3>${esc(c.name)}</h3>
+    <p>${esc(c.description)}</p>
+    ${c.sharesWith && c.sharesWith.length ? `<span class="shares">${IC.leaf}Shares ${esc(c.sharesWith.join(", "))}</span>` : ""}
+    <span class="meta">${c.totalMinutes ? `<span>${c.totalMinutes} min</span>` : ""}${c.cuisine ? `<span>${esc(c.cuisine)}</span>` : ""}${c.cost ? `<span class="cost">${esc(c.cost)}</span>` : ""}</span>
+    ${c.keyIngredients.length ? `<span class="ings">${esc(c.keyIngredients.join(" · "))}</span>` : ""}
+    <div class="acts">
+      <button class="btn small" data-action="reject" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.x}Pass</button>
+      <button class="btn small ${isP ? "" : "primary"}" data-action="pick" data-id="${c.id}" ${!isP && full ? "disabled" : ""}>${isP ? "Picked · undo" : IC.check + "Pick"}</button>
+    </div></article>`;
+}
+function modelOptions(){
+  const cur = gemModel();
+  const names = [...new Set([...(modelList || MODEL_CHAIN), ...(cur !== "auto" ? [cur] : [])])];
+  return `<option value="auto" ${cur === "auto" ? "selected" : ""}>Automatic (recommended)</option>` + names.map(n => `<option value="${esc(n)}" ${n === cur ? "selected" : ""}>${esc(n)}</option>`).join("");
+}
+function houseBox(){
+  if (!store.user || !store.hid) return "";
+  const h = store.house || {}, ids = h.members || [], names = h.names || {};
+  const who = ids.map(id => id === store.user.uid ? "You" : (names[id] || "Family member"));
+  return `<details class="fold" id="fold-house" ${S.open.house ? "open" : ""}>
+    <summary><span><span class="t">Household</span><span class="s">${ids.length > 1 ? esc(who.join(", ")) : "Just you so far"}</span></span>${IC.chev}</summary>
+    <div class="inner">
+      <span class="hint">Everyone in the household sees the same meal plan, shopping list and recipe box, and shares the Gemini key.</span>
+      <div class="field"><span class="lbl">Invite family</span>
+        <div class="row"><button class="btn small primary" data-action="copyinvite">${IC.copy}Copy invite link</button></div>
+        <span class="hint">Send them the link. They open it, sign in with Google, and tap Join. Code: <code>${esc(store.hid)}</code></span></div>
+      <div class="field"><label for="joincode">Join someone else's household</label>
+        <div class="row" style="flex-wrap:nowrap"><input type="text" id="joincode" placeholder="Paste a code or invite link" autocomplete="off"><button class="btn small" data-action="join">Join</button></div></div>
+      ${ids.length > 1 ? `<div><button class="btn small danger ${S.armed === "leave" ? "armed" : ""}" data-action="leave">${S.armed === "leave" ? "Tap again to leave" : "Leave household"}</button></div>` : ""}
+    </div></details>`;
+}
+function joinBanner(){
+  if (!pendingJoin || pendingJoin === store.hid) return "";
+  if (!store.fb) return "";
+  return `<div class="notice" style="margin-top:8px"><span><strong>You've been invited to a household.</strong> ${store.user ? "Join to share meals and the shopping list." : "Sign in with Google to join."}</span>
+    <span class="row">${store.user ? `<button class="btn small primary" data-action="joinpending">Join household</button>` : `<button class="btn small primary" data-action="signin">Sign in</button>`}<button class="btn small quiet" data-action="dismissjoin">Not now</button></span></div>`;
+}
+function sSettings(){
+  const needKey = !gemKey();
+  let acct;
+  if (store.fbError && !store.fb) acct = `<div class="warnbox">${esc(store.fbError)}</div>`;
+  else if (!FIREBASE_CONFIG.apiKey) acct = `<div class="warnbox">Sync is off. Paste your Firebase settings into the block marked "PASTE YOUR FIREBASE SETTINGS HERE" in <code>index.html</code> to share meals across devices and family.</div>`;
+  else if (!store.user) acct = (store.fbError ? `<div class="warnbox">${esc(store.fbError)}</div>` : "") + `<div class="row"><button class="btn small primary" data-action="signin">Sign in with Google</button><span class="hint">Sign in on each device to sync.</span></div>`;
+  else acct = (store.fbError ? `<div class="warnbox">${esc(store.fbError)}</div>` : "") + `<div class="row"><span class="okline">Signed in as ${esc(store.user.email || store.user.displayName || "you")}.</span>
+      <button class="btn small ${S.armed === "signout" ? "armed" : "quiet"}" data-action="signout">${S.armed === "signout" ? "Tap again to sign out" : "Sign out"}</button></div>`;
+  const h = store.house || {}, ids = h.members || [], names = h.names || {};
+  const who = ids.map(id => store.user && id === store.user.uid ? "You" : (names[id] || "Family member"));
+  const house = store.user && store.hid ? `<section class="setsec"><h3>Household</h3>
+      <p class="hint">${ids.length > 1 ? "Members: " + esc(who.join(", ")) + "." : "Just you so far."} Everyone in the household sees the same meal plan, shopping list and recipe box, and shares the Gemini key.</p>
+      <div class="field"><span class="lbl">Invite family</span>
+        <div class="row"><button class="btn small primary" data-action="copyinvite">${IC.copy}Copy invite link</button></div>
+        <span class="hint">Send them the link. They open it, sign in with Google, and tap Join. Code: <code class="code">${esc(store.hid)}</code></span></div>
+      <div class="field"><label for="joincode">Join someone else's household</label>
+        <div class="joinrow"><input type="text" id="joincode" placeholder="Paste a code or invite link" autocomplete="off"><button class="btn small" data-action="join">Join</button></div></div>
+      ${ids.length > 1 ? `<div><button class="btn small danger ${S.armed === "leave" ? "armed" : ""}" data-action="leave">${S.armed === "leave" ? "Tap again to leave" : "Leave household"}</button></div>` : ""}
+    </section>` : "";
+  return `<div class="sheet-head"><h2>Settings</h2><button class="x" data-action="close" aria-label="Close">${IC.x}</button></div>
+    <div class="stack">
+      <section class="setsec"><h3>Account</h3>${acct}</section>
+      <section class="setsec"><h3>Gemini</h3>
+        <div class="field"><label for="gkey">Gemini API key</label>
+          <input type="password" id="gkey" autocomplete="off" placeholder="Paste your key from Google AI Studio" value="${esc(gemKey())}"></div>
+        <div class="field"><label for="gmodel">Gemini model</label>
+          <select id="gmodel">${modelOptions()}</select>
+          <span class="hint">Automatic tries the fastest available model first and moves to another when one is busy.</span>
+          <span class="hint" id="lastModel">${lastModel ? "Last answer came from " + esc(lastModel) + "." : ""}</span></div>
+        <div class="row"><button class="btn small primary" data-action="savekey">Save</button><span class="hint">${needKey ? "Needed to write meals." : store.user ? "Shared with your household." : "Saved on this device."}</span></div>
+      </section>
+      ${house}
+      ${installBox()}
+    </div>`;
+}
+
+/* ---------- view: shopping ---------- */
+function shopRows(){
+  const sh = S.plan.shopping;
+  const rows = sh ? sh.items.map((it, i) => ({ ...it, key: "m" + i })) : [];
+  return rows.concat(S.extras.map(x => ({ ...x, meals: [], pantry: false, key: "x" + x.id })));
+}
+function vShopping(){
+  const sh = S.plan.shopping, stale = sh && sh.builtFor !== shopIds(), pend = pendingRecipes().length;
+  const rows = shopRows();
+  const head = `<div class="view-head"><div><h2>Shopping list</h2><p>${sh ? `For ${openMeals().length} upcoming meal${openMeals().length === 1 ? "" : "s"} · ${S.settings.people} people` : "Built from the meals in your plan, plus anything you add."}</p></div>
+    ${rows.length ? `<div class="row"><button class="chip" data-action="hidepantry" aria-pressed="${S.hidePantry}">Hide pantry staples</button><button class="btn small" data-action="copy">${IC.copy}Copy list</button></div>` : ""}</div>`;
+  const addBox = `<section class="panel addbox"><label class="lbl" for="addtxt">Add items</label>
+    <textarea id="addtxt" rows="2" placeholder="Type items or paste your Alexa list, one per line"></textarea>
+    <div class="row"><button class="btn small primary" data-action="addextras">${IC.plus}Add to list</button><span class="hint">Items you add stay on the list when it's rebuilt.</span></div></section>`;
+  if (S.busy && S.busy.kind === "shop") return head + busyBox();
+  let top = "";
+  if (!sh) {
+    top = openMeals().length
+      ? `<div class="notice"><span>${pend ? `Waiting for ${pend} recipe${pend > 1 ? "s" : ""} to finish writing.` : `Build a list from the ${openMeals().length} meals in your plan.`}</span><button class="btn small primary" data-action="buildshop" ${pend ? "disabled" : ""}>Build shopping list</button></div>`
+      : rows.length ? "" : `<div class="empty"><h3>Nothing to shop for yet</h3><p>Pick meals and build the list from the Meal Plan, or add your own items below.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
+  } else if (stale) {
+    top = `<div class="notice"><span>${pend ? "Some recipes are still being written." : "Your meal plan changed since this list was made."}</span><button class="btn small" data-action="buildshop" ${pend ? "disabled" : ""}>Update list</button></div>`;
+  }
+  const groups = SECTIONS.map(sec => [sec, rows.filter(it => it.section === sec && !(S.hidePantry && it.pantry))]).filter(g => g[1].length);
+  const left = sh ? sh.items.filter(i => i.leftover) : [];
+  const useUp = sh && ((sh.useItUp && sh.useItUp.length) || left.length) ? `<section class="panel useup"><h3>${IC.leaf}Use it up</h3>
+    ${left.length ? `<p class="muted" style="margin:0 0 6px">${left.length} item${left.length > 1 ? "s" : ""} will have some left over after this week's meals.</p>` : ""}
+    ${sh.useItUp && sh.useItUp.length ? `<ul>${sh.useItUp.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</section>` : "";
+  return head + top + addBox + useUp + `<div class="shop">${groups.map(([sec, items]) => `<section class="panel aisle"><h3>${esc(sec)}<span>${items.filter(x => !x.got).length} left</span></h3>
+    ${items.map(it => `<div class="item ${it.got ? "got" : ""} ${it.added ? "isx" : ""}"><input type="checkbox" id="chk-${it.key}" data-action="got" data-k="${it.key}" ${it.got ? "checked" : ""}>
+      <label class="nm" for="chk-${it.key}">${esc(it.item)}${it.pantry ? '<span class="tag">pantry</span>' : ""}${it.added ? '<span class="tag">added</span>' : ""}${it.meals.length ? `<span class="for">${esc(it.meals.join(", "))}</span>` : ""}${it.leftover ? `<span class="left">${IC.leaf}${esc(it.leftover)} left over</span>` : ""}</label>
+      <span class="qty">${esc(it.quantity)}</span>${it.added ? `<button class="rmx" data-action="rmx" data-id="${it.id}" aria-label="Remove ${esc(it.item)}">${IC.x}</button>` : ""}</div>`).join("")}
+  </section>`).join("")}</div>`;
+}
+
+/* ---------- view: recipes ---------- */
+function filteredRecipes(){
+  const f = S.filter;
+  let list = recipesArr();
+  if (f.tab === "fav") list = list.filter(r => r.favorite);
+  if (f.tab === "mine") list = list.filter(r => r.source !== "ai");
+  if (f.cat) list = list.filter(r => r.category === f.cat);
+  if (f.q) { const q = f.q.toLowerCase(); list = list.filter(r => (r.name + " " + r.cuisine + " " + r.ingredients.map(i => i.item).join(" ")).toLowerCase().includes(q)); }
+  return list.sort((a, b) => (b.favorite - a.favorite) || (b.rating - a.rating) || (b.createdAt - a.createdAt));
+}
+function vRecipes(){
+  const f = S.filter;
+  const cats = CATS.filter(c => recipesArr().some(r => r.category === c));
+  const tabs = [["all","All"],["fav","Favorites"],["mine","My recipes"]];
+  return `<div class="view-head"><div><h2>Recipe box</h2><p>${recipesArr().length} recipes · ${recipesArr().filter(r => r.favorite).length} favorites</p></div>
+    <button class="btn primary" data-action="add">${IC.plus}Add a recipe</button></div>
+    <div class="boxbar"><div class="seg">${tabs.map(([k, l]) => `<button data-action="tab" data-v="${k}" aria-pressed="${f.tab === k}">${l}</button>`).join("")}</div>
+    <input type="search" id="q" data-bind="filter.q" placeholder="Search recipes or ingredients" value="${esc(f.q)}" aria-label="Search recipes"></div>
+    ${cats.length ? `<div class="chips" style="margin-bottom:18px"><button class="chip" data-action="cat" data-v="" aria-pressed="${!f.cat}">All categories</button>${cats.map(c => `<button class="chip" data-action="cat" data-v="${esc(c)}" aria-pressed="${f.cat === c}">${catLabel(c)} ${esc(c)}</button>`).join("")}</div>` : ""}
+    <div id="boxList">${boxList(filteredRecipes())}</div>`;
+}
+function boxList(list){
+  if (!recipesArr().length) return `<div class="empty"><h3>Your recipe box is empty</h3><p>Meals you plan land here. Rate one 4 stars or more and it's saved as a favorite. You can also add your own recipes by typing or from a photo.</p><button class="btn primary" data-action="add">${IC.plus}Add a recipe</button></div>`;
+  if (!list.length) return `<div class="empty"><h3>No matches</h3><p>Try a different filter or search.</p></div>`;
+  return `<div class="tiles">${list.map(r => tile(r)).join("")}</div>`;
+}
+
+/* ---------- sheets ---------- */
+function renderSheet(){
+  const root = document.getElementById("sheetRoot");
+  if (!S.sheet) { root.innerHTML = ""; document.body.style.overflow = ""; return; }
+  const body = S.sheet.type === "recipe" ? sRecipe() : S.sheet.type === "settings" ? sSettings() : sAdd();
+  if (!body) { S.sheet = null; root.innerHTML = ""; document.body.style.overflow = ""; return; }
+  const keep = root.querySelector(".sheet"); const top = keep ? keep.scrollTop : 0;
+  root.innerHTML = `<div class="scrim" data-action="scrim"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
+  root.querySelector(".sheet").scrollTop = top;
+  document.body.style.overflow = "hidden";
+}
+function sRecipe(){
+  const r = S.recipes[S.sheet.id]; if (!r) return "";
+  const times = [r.prepMinutes ? `Prep ${r.prepMinutes} min` : "", r.cookMinutes ? `Cook ${r.cookMinutes} min` : ""].filter(Boolean);
+  return `<div class="sheet-head"><div><span class="eyebrow" style="display:flex;gap:7px;align-items:center">${catLabel(r.category)} · ${esc(cap(r.mealType))}${r.source !== "ai" ? " · My recipe" : ""}</span><h2 style="margin-top:6px">${esc(r.name)}</h2></div>
+      <button class="x" data-action="close" aria-label="Close">${IC.x}</button></div>
+    <div class="meta" style="font-size:.92rem;margin-bottom:14px"><span>Serves ${r.servings}</span>${times.map(t => `<span>${t}</span>`).join("")}${r.cuisine ? `<span>${esc(r.cuisine)}</span>` : ""}${r.cost ? `<span class="cost">${esc(r.cost)}</span>` : ""}</div>
+    ${r.description ? `<p class="muted" style="margin:0 0 14px;max-width:65ch">${esc(r.description)}</p>` : ""}
+    <div class="toggles">
+      ${S.sheet.from === "plan" && r.inPlan && !r.pending ? `<button class="toggle" data-action="toggle-done" data-id="${r.id}" aria-pressed="${r.done}">${IC.check}${r.done ? "Made it" : "Mark as made"}</button>` : ""}
+      <button class="toggle fav-t" data-action="fav" data-id="${r.id}" aria-pressed="${r.favorite}">${r.favorite ? IC.heart : IC.heartO}${r.favorite ? "Favorite" : "Save as favorite"}</button>
+      <button class="toggle" data-action="inplan" data-id="${r.id}" aria-pressed="${!!r.inPlan}">${IC.cal}${r.inPlan ? "In this week's plan" : "Add to this week"}</button>
+    </div>
+    <div style="margin-top:16px"><span class="lbl">Your rating</span>
+      <div class="stars" role="group" aria-label="Rate this recipe">${[1,2,3,4,5].map(n => `<button class="${n <= r.rating ? "on" : ""}" data-action="rate" data-id="${r.id}" data-v="${n}" aria-label="${n} star${n > 1 ? "s" : ""}" aria-pressed="${n === r.rating}">${IC.star}</button>`).join("")}</div>
+      <span class="hint">4 or 5 stars saves it to your favorites.</span></div>
+    ${r.pending ? `<div class="busy" style="margin-top:16px"><span class="spin"></span><div>Writing the full recipe…<small>It appears here in a moment.</small></div></div>` : ""}
+    ${r.writeFailed ? `<div class="notice" style="margin-top:16px"><span>The recipe couldn't be written.</span><button class="btn small primary" data-action="retrywrite" data-id="${r.id}">Try again</button></div>` : ""}
+    <div class="recipe-cols" ${r.pending || r.writeFailed ? "hidden" : ""}>
+      <section><h3>Ingredients</h3><ul class="ing">${r.ingredients.map(i => `<li><b>${esc(ingAmount(i))}</b><span>${esc(i.item)}${i.note ? `<span class="muted">, ${esc(i.note)}</span>` : ""}</span></li>`).join("") || '<li class="muted">No ingredients listed.</li>'}</ul></section>
+      <section><h3>Directions</h3><ol class="steps">${r.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("") || '<li class="muted"><span>No steps listed.</span></li>'}</ol>
+      ${r.tips ? `<div class="tipbox"><strong>Tip:</strong> ${esc(r.tips)}</div>` : ""}</section>
+    </div>
+    <div class="row" style="margin-top:22px;justify-content:flex-end"><button class="btn small danger ${S.armed === "del-" + r.id ? "armed" : ""}" data-action="delete" data-id="${r.id}">${S.armed === "del-" + r.id ? "Tap again to delete" : "Delete recipe"}</button></div>`;
+}
+function sAdd(){
+  const d = S.sheet.draft;
+  return `<div class="sheet-head"><h2>Add a recipe</h2><button class="x" data-action="close" aria-label="Close">${IC.x}</button></div>
+    <p class="muted" style="margin:0 0 16px">Type it in, or start from a photo of a recipe card or cookbook page.</p>
+    <div class="stack">
+      <div class="photo-drop">
+        ${S.sheet.photos.length ? `<div class="thumbs">${S.sheet.photos.map((p, i) => `<span class="thumb"><img src="${p.url}" alt="Recipe photo ${i + 1}"><button data-action="rmphoto" data-i="${i}" aria-label="Remove photo ${i + 1}">${IC.x}</button></span>`).join("")}</div>` : ""}
+        <div class="row">
+          <label class="btn small" for="photo">${IC.cam}${S.sheet.photos.length ? "Add another photo" : "Choose photos"}</label>
+          <input type="file" id="photo" accept="image/*" multiple class="sr">
+          ${S.sheet.photos.length ? (S.busy && S.busy.kind === "photo" ? busyBox() : `<button class="btn small primary" data-action="readphoto">Read the recipe${S.sheet.photos.length > 1 ? ` (${S.sheet.photos.length} photos)` : ""}</button>`) : ""}
+        </div>
+        <span class="hint">${S.sheet.photos.length ? "Add the back of the card or more pages, then tap Read the recipe." : "Add one or more photos, like the front and back of a recipe card. Gemini reads them into the form below for you to check."}</span></div>
+      <div class="field"><label for="d-name">Recipe name</label><input type="text" id="d-name" data-bind="draft.name" value="${esc(d.name)}" placeholder="Grandma's chicken enchiladas"></div>
+      <div class="grid2">
+        <div class="field"><label for="d-cat">Category</label><select id="d-cat" data-bind="draft.category">${CATS.map(c => `<option ${c === d.category ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
+        <div class="field"><label for="d-type">Meal type</label><select id="d-type" data-bind="draft.mealType">${TYPES.map(([k, l]) => `<option value="${k}" ${k === d.mealType ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+        <div class="field"><label for="d-serv">Serves</label><input type="number" id="d-serv" min="1" max="30" data-bind="draft.servings" value="${esc(d.servings)}"></div>
+        <div class="field"><label for="d-prep">Prep min</label><input type="number" id="d-prep" min="0" data-bind="draft.prepMinutes" value="${esc(d.prepMinutes)}"></div>
+        <div class="field"><label for="d-cook">Cook min</label><input type="number" id="d-cook" min="0" data-bind="draft.cookMinutes" value="${esc(d.cookMinutes)}"></div>
+      </div>
+      <div class="field"><label for="d-ing">Ingredients</label><textarea id="d-ing" data-bind="draft.ingredients" rows="6" placeholder="One per line&#10;2 lb chicken thighs&#10;1 can (10 oz) red enchilada sauce">${esc(d.ingredients)}</textarea></div>
+      <div class="field"><label for="d-steps">Directions</label><textarea id="d-steps" data-bind="draft.steps" rows="6" placeholder="One step per line">${esc(d.steps)}</textarea></div>
+      <div class="field"><label for="d-tips">Notes</label><input type="text" id="d-tips" data-bind="draft.tips" value="${esc(d.tips)}" placeholder="Optional"></div>
+      <div class="toggles"><button class="toggle" data-action="draft-plan" aria-pressed="${!!d.addToPlan}">${IC.cal}Add to this week's plan</button>
+        <button class="toggle fav-t" data-action="draft-fav" aria-pressed="${!!d.favorite}">${d.favorite ? IC.heart : IC.heartO}Favorite</button></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn quiet" data-action="close">Cancel</button><button class="btn primary" data-action="save-new">Save recipe</button></div>
+    </div>`;
+}
+const newDraft = () => ({ name: "", category: "Other", mealType: "dinner", servings: S.settings.people, prepMinutes: "", cookMinutes: "", ingredients: "", steps: "", tips: "", addToPlan: false, favorite: true });
+function parseIngLine(line){
+  const m = line.match(/^\s*([\d\s\/.½¼¾⅓⅔⅛-]+)?\s*(cups?|tbsp|tablespoons?|tsp|teaspoons?|lbs?|pounds?|oz|ounces?|g|grams?|kg|ml|l|cans?|cloves?|pinch|dash)?\.?\s+(.*)$/i);
+  if (!m || !m[1] || !m[1].trim()) return { item: line.trim(), quantity: null, unit: "", note: "" };
+  const q = m[1].trim().replace("½", " 1/2").replace("¼", " 1/4").replace("¾", " 3/4").replace("⅓", " 1/3").replace("⅔", " 2/3").replace("⅛", " 1/8");
+  let val = 0; for (const part of q.split(/\s+/).filter(Boolean)) { if (part.includes("/")) { const [a, b] = part.split("/").map(Number); if (b) val += a / b; } else val += Number(part) || 0; }
+  return { item: m[3].trim(), quantity: val || null, unit: (m[2] || "").toLowerCase(), note: "" };
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e => {
+  const el = e.target.closest("[data-action]"); if (!el || el.disabled) return;
+  const a = el.dataset.action, id = el.dataset.id, v = el.dataset.v;
+  if (a === "scrim") { if (e.target === el) { S.sheet = null; S.armed = null; renderSheet(); } return; }
+  if (a === "got") return; /* checkbox: handled on change */
+  if (!["clear-done","delete","signout","leave"].includes(a)) S.armed = null;
+  const s = S.settings;
+  switch (a){
+    case "go": S.view = v; S.sheet = null; render(); window.scrollTo(0, 0); break;
+    case "step": {
+      const f = el.dataset.f, d = Number(el.dataset.d);
+      if (f === "meals") s.meals = clamp(s.meals + d, 1, 28);
+      if (f === "people") s.people = clamp(s.people + d, 1, 16);
+      if (f === "favorites") s.favorites = clamp((s.favorites ?? 1) + d, 0, 5);
+      persist("settings"); render(); break;
+    }
+    case "type": { const t = [...s.mealTypes]; const i = t.indexOf(v); if (i >= 0) { if (t.length > 1) t.splice(i, 1); } else t.push(v); s.mealTypes = TYPES.map(x => x[0]).filter(k => t.includes(k)); persist("settings"); render(); break; }
+    case "opt": s.options = { ...s.options, [v]: !optOn(v) }; persist("settings"); render(); break;
+    case "savekey": {
+      const k = document.getElementById("gkey").value.trim(), m = document.getElementById("gmodel").value || "auto";
+      lsSet(LS_GEM, k); lsSet(LS_MODEL, m); if (store.mode === "cloud") persist("secrets");
+      modelBad = {}; render(); toast(k ? "Gemini key saved." : "Key removed."); if (k) { loadModels(); resumeWrites(); queueWrites(200); } break; }
+    case "signin": if (store.fb) signIn(); break;
+    case "copyinvite": {
+      const link = inviteLink();
+      try { await navigator.clipboard.writeText(link); toast("Invite link copied. Send it to your family."); }
+      catch { const t = document.createElement("textarea"); t.value = link; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); toast(ok ? "Invite link copied." : "Copy this link: " + link); }
+      break; }
+    case "join": joinHousehold(document.getElementById("joincode").value); break;
+    case "joinpending": joinHousehold(pendingJoin); break;
+    case "dismissjoin": clearJoinParam(); render(); break;
+    case "leave": if (S.armed !== "leave") { S.armed = "leave"; render(); break; }
+      S.armed = null; leaveHousehold(); break;
+    case "signout": if (S.armed !== "signout") { S.armed = "signout"; renderSheet(); break; }
+      S.armed = null; S.sheet = null; renderSheet(); await store.fb.A.signOut(store.fb.auth); break;
+    case "generate": S.open.settings = false; suggest(initialCount(), { fresh: S.plan.candidates.length > 0, withFavorites: true }); break;
+    case "more": suggest(5); break;
+    case "pick": {
+      const c = S.plan.candidates.find(x => x.id === id); if (!c) break;
+      if (c.status === "picked") unpickCandidate(c); else pickCandidate(c);
+      render(); break; }
+    case "reject": {
+      const c = S.plan.candidates.find(x => x.id === id); if (!c) break;
+      S.plan.candidates = S.plan.candidates.filter(x => x.id !== id); S.plan.rejected = [...S.plan.rejected, c.name].slice(-200);
+      persist("plan"); render(); break; }
+    case "settings": openSettings(); break;
+    case "install": if (installPrompt) { installPrompt.prompt(); const r = await installPrompt.userChoice.catch(() => null); if (r && r.outcome === "accepted") installPrompt = null; renderSheet(); } break;
+    case "buildshop": if (pendingRecipes().length) { toast("Wait for the recipes to finish writing."); break; } await buildShopping(); S.view = "shopping"; render(); window.scrollTo(0, 0); break;
+    case "retrywrite": { const r = S.recipes[id]; if (!r) break; if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); break; }
+      r.writeFailed = false; r.pending = true; r.pendingSince = Date.now(); saveRecipe(r); queueWrites(100); render(); break; }
+    case "addextras": { const t = document.getElementById("addtxt"); const n = await addExtras(t ? t.value : ""); if (n) { const t2 = document.getElementById("addtxt"); if (t2) t2.value = ""; } break; }
+    case "rmx": S.extras = S.extras.filter(x => x.id !== id); persist("extras"); render(); break;
+    case "rmphoto": { const i = Number(el.dataset.i); const p = S.sheet.photos[i]; if (p) URL.revokeObjectURL(p.url); S.sheet.photos.splice(i, 1); renderSheet(); break; }
+    case "open": S.sheet = { type: "recipe", id, from: S.view }; renderSheet(); break;
+    case "close": S.sheet = null; renderSheet(); break;
+    case "toggle-done": { const r = S.recipes[id]; if (!r) break; r.done = !r.done; r.doneAt = r.done ? Date.now() : (r.doneAt || null); saveRecipe(r); render();
+      if (r.done && !r.rating) toast("Marked as made. Open it to rate it."); break; }
+    case "fav": { const r = S.recipes[id]; r.favorite = !r.favorite; saveRecipe(r); render(); break; }
+    case "inplan": { const r = S.recipes[id]; r.inPlan = !r.inPlan; if (r.inPlan) { r.done = false; r.addedAt = Date.now(); } saveRecipe(r); syncCandidates(); render();
+      const n = weekCount(); toast(r.inPlan ? `Added to this week (${n} of ${s.meals} planned).` + (n > s.meals ? " That's more than your plan size." : "") : "Removed from this week's plan."); break; }
+    case "rate": { const r = S.recipes[id]; const n = Number(v); r.rating = r.rating === n ? 0 : n;
+      if (r.rating >= 4 && !r.favorite) { r.favorite = true; toast("Saved to favorites."); }
+      saveRecipe(r); render(); break; }
+    case "delete": if (S.armed !== "del-" + id) { S.armed = "del-" + id; renderSheet(); break; }
+      S.armed = null; delete S.recipes[id]; persist("r-" + id); syncCandidates(); S.sheet = null; render(); toast("Recipe deleted."); break;
+    case "clear-done": if (S.armed !== "clear") { S.armed = "clear"; render(); break; }
+      S.armed = null; planRecipes().filter(r => r.done).forEach(r => { r.inPlan = false; saveRecipe(r); }); syncCandidates(); render(); break;
+    case "hidepantry": S.hidePantry = !S.hidePantry; render(); break;
+    case "rebuild": await buildShopping(); render(); break;
+    case "copy": {
+      const rows = shopRows(); if (!rows.length) break;
+      const txt = SECTIONS.map(sec => { const its = rows.filter(i => i.section === sec && !i.got && !(S.hidePantry && i.pantry)); return its.length ? sec.toUpperCase() + "\n" + its.map(i => `- ${i.item}${i.quantity ? " (" + i.quantity + ")" : ""}`).join("\n") : ""; }).filter(Boolean).join("\n\n");
+      try { await navigator.clipboard.writeText(txt); toast("Shopping list copied."); }
+      catch { const t = document.createElement("textarea"); t.value = txt; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); toast(ok ? "Shopping list copied." : "Couldn't copy the list on this device."); }
+      break; }
+    case "tab": S.filter.tab = v; render(); break;
+    case "cat": S.filter.cat = v; render(); break;
+    case "add": S.sheet = { type: "add", draft: newDraft(), photos: [] }; renderSheet(); break;
+    case "draft-plan": S.sheet.draft.addToPlan = !S.sheet.draft.addToPlan; renderSheet(); break;
+    case "draft-fav": S.sheet.draft.favorite = !S.sheet.draft.favorite; renderSheet(); break;
+    case "readphoto": readPhoto(); break;
+    case "save-new": {
+      const d = S.sheet.draft;
+      if (!d.name.trim()) { toast("Give the recipe a name first."); document.getElementById("d-name")?.focus(); break; }
+      const r = { id: uid(), name: d.name.trim(), description: "", mealType: d.mealType, category: d.category, cuisine: "", cost: "",
+        servings: num(d.servings, s.people) || s.people, prepMinutes: num(d.prepMinutes), cookMinutes: num(d.cookMinutes),
+        ingredients: d.ingredients.split("\n").map(x => x.trim()).filter(Boolean).map(parseIngLine),
+        steps: d.steps.split("\n").map(x => x.trim()).filter(Boolean), tips: d.tips.trim(),
+        source: S.sheet.photos.length ? "photo" : "personal", rating: 0, favorite: !!d.favorite, done: false, inPlan: !!d.addToPlan, addedAt: Date.now(), createdAt: Date.now() };
+      saveRecipe(r); S.sheet.photos.forEach(p => URL.revokeObjectURL(p.url)); S.sheet = { type: "recipe", id: r.id, from: S.view }; render(); toast(r.favorite ? "Recipe saved to your favorites." : "Recipe saved to your box."); break; }
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset.action === "got") {
+    const k = t.dataset.k;
+    if (k[0] === "m") { const it = S.plan.shopping && S.plan.shopping.items[Number(k.slice(1))]; if (it) { it.got = t.checked; persist("shopping"); } }
+    else { const it = S.extras.find(x => "x" + x.id === k); if (it) { it.got = t.checked; persist("extras"); } }
+    render(); return;
+  }
+  if (t.id === "photo" && t.files && t.files.length) {
+    const room = 6 - S.sheet.photos.length;
+    if (t.files.length > room) toast("Up to 6 photos per recipe.");
+    for (const f of [...t.files].slice(0, Math.max(0, room))) S.sheet.photos.push({ file: f, url: URL.createObjectURL(f) });
+    renderSheet(); return;
+  }
+  if (t.tagName === "SELECT" && t.dataset.bind) bind(t);
+});
+let qT;
+document.addEventListener("input", e => {
+  const t = e.target; if (!t.dataset.bind) return;
+  bind(t);
+  if (t.dataset.bind === "filter.q") { clearTimeout(qT); qT = setTimeout(() => { const box = document.getElementById("boxList"); if (box) box.innerHTML = boxList(filteredRecipes()); }, 150); }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && S.sheet) { S.sheet = null; renderSheet(); }
+  if (e.key === "Enter" && e.target.id === "req") { e.preventDefault(); e.target.blur(); document.querySelector('[data-action="generate"]')?.click(); }
+});
+function bind(t){
+  const k = t.dataset.bind;
+  if (k === "requests") { S.settings.requests = t.value; persist("settings"); }
+  else if (k === "filter.q") S.filter.q = t.value;
+  else if (k.startsWith("draft.") && S.sheet && S.sheet.draft) S.sheet.draft[k.slice(6)] = t.value;
+}
+document.addEventListener("toggle", e => {
+  if (e.target.id === "fold-settings") S.open.settings = e.target.open;
+  if (e.target.id === "fold-conn") S.open.conn = e.target.open;
+  if (e.target.id === "fold-house") S.open.house = e.target.open;
+}, true);
+
+/* ---------- start ---------- */
+async function init(){
+  try { loadLocal(); render(); } catch (e) { console.error(e); }
+  try {
+    const u = await initFirebase();
+    if (u) {
+      const ok = await withTimeout(connectCloud(u), 15000, "loading meals").catch(e => { fsErr(e, "Couldn't load your saved meals."); return false; });
+      if (!ok) { store.mode = "local"; store.user = store.user || null; loadLocal(); }
+    }
+  } catch (e) { console.error(e); store.fbError = store.fbError || ("Couldn't connect: " + (e && (e.message || e.code))); }
+  finally {
+    window.__mbLoaded = true;
+    S.loaded = true;
+    S.view = openMeals().length ? "plan" : "generate";
+    syncCandidates(); migrateOnce(); resumeWrites();
+    try { render(); } catch (e) { console.error(e); showFatal(e); }
+    if (store.fbError) toast(store.fbError);
+    loadModels();
+  }
+}
+function showFatal(e){
+  const v = document.getElementById("view");
+  v.innerHTML = `<div class="empty" style="margin-top:20px"><h3>Something went wrong</h3><p>${esc(String(e && (e.message || e)))}</p><p>Send this message to whoever set up the app.</p></div>`;
+}
+init();
+</script>
+
+</body>
+</html>
