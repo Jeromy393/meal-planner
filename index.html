@@ -294,6 +294,28 @@ code.code{word-break:break-all}
 .rmx svg{width:15px;height:15px}
 .rmx:hover{color:var(--danger);background:var(--danger-soft)}
 .notice{margin-bottom:16px}
+.votes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vote{display:inline-flex;align-items:center;gap:4px;min-height:34px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.95rem}
+.vote span{font-size:.82rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.vote[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.votes .who{font-size:.82rem;color:var(--muted);min-width:0}
+.famrate{display:block;margin-top:4px;font-size:.88rem;color:var(--gold)}
+.aisles{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.aisle-row{display:grid;grid-template-columns:32px minmax(0,1fr) 36px 36px;align-items:center;gap:4px;padding:4px 6px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.aisle-row.dragging{border-color:var(--accent);box-shadow:var(--shadow);background:var(--accent-soft)}
+.grip{display:grid;place-items:center;height:36px;color:var(--muted);cursor:grab;touch-action:none}
+.grip svg{width:18px;height:18px}
+.aisle-row .an{font-weight:700}
+.mv{width:36px;height:36px;border:0;border-radius:8px;background:none;display:grid;place-items:center;color:var(--muted);padding:0}
+.mv svg{width:18px;height:18px}
+.mv:disabled{opacity:.3}
+.mv:not(:disabled):hover{background:var(--sunk);color:var(--ink)}
+.aisle.cart{background:var(--sunk);border-color:transparent}
+.aisle.cart h3{color:var(--muted)}
+.aisle h3 .sec{display:inline-flex;align-items:center;gap:6px;font-weight:inherit}
+.aisle.cart h3 svg{width:16px;height:16px;color:var(--accent)}
+.shop{align-items:start}
+@media (min-width:700px){.aisle.cart{grid-column:1/-1}}
 </style>
 
 <script>
@@ -361,6 +383,8 @@ const TYPES = [["breakfast","Breakfast"],["lunch","Lunch"],["dinner","Dinner"]];
 const OPTIONS = [["lowwaste","Low food waste"],["budget","Budget friendly"],["quick","Under 30 minutes"],["slowcooker","Include slow cooker"],["healthy","Lighter / healthy"],["leftovers","Good for leftovers"]];
 const OPT_TEXT = {lowwaste:"minimize food waste: favor meals that share perishable ingredients (fresh herbs, produce, dairy, proteins) so partly used packages get finished, and avoid ingredients that are only sold in large amounts when a meal would barely use them",budget:"keep it budget friendly with affordable, common ingredients",quick:"total time 30 minutes or less",slowcooker:"include slow cooker (Crock-Pot) meals: make roughly a quarter of the ideas, and at least one, slow cooker dishes, and write those recipes with slow cooker steps and times",healthy:"lighter, healthier meals",leftovers:"meals that reheat well as leftovers"};
 const SECTIONS = ["Produce","Meat & Seafood","Dairy & Eggs","Bakery","Pantry","Spices & Condiments","Frozen","Other"];
+/* The household's own walking order through the store (Settings > Shopping list order). */
+const aisleOrder = () => { const saved = (S.settings && Array.isArray(S.settings.aisles)) ? S.settings.aisles.filter(x => SECTIONS.includes(x)) : []; return [...new Set([...saved, ...SECTIONS])]; };
 const DEFAULT_SETTINGS = {people:4, meals:4, mealTypes:["dinner"], options:{lowwaste:true}, requests:"", favorites:1};
 /* "Low food waste" is on unless it was turned off. */
 const optOn = k => k === "lowwaste" ? (S.settings.options || {}).lowwaste !== false : !!(S.settings.options || {})[k];
@@ -384,6 +408,9 @@ const IC = {
   leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15"/><path d="M5 19l7-7"/></svg>',
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
 };
 
@@ -414,6 +441,8 @@ const S = {
   plan: { candidates: [], rejected: [], shopping: null },
   recipes: {},
   extras: [],
+  votes: {},      // { personId: { ideaId: 1 | -1 } }
+  ratings: {},    // { personId: { recipeId: 1..5 } }
   view: null, sheet: null, busy: null, loaded: false, armed: null,
   open: { settings: false, conn: false, house: false },
   filter: { tab: "all", cat: "", q: "" }, hidePantry: false
@@ -435,13 +464,15 @@ function docData(key){
   if (key === "plan") { const p = { ...S.plan }; delete p.shopping; return { kind: "plan", ...p }; }
   if (key === "shopping") return { kind: "shopping", list: S.plan.shopping || null };
   if (key === "extras") return { kind: "extras", items: S.extras };
+  if (key.startsWith("votes-")) { const u = key.slice(6); const ids = new Set(S.plan.candidates.map(c => c.id)); const v = {}; Object.entries(S.votes[u] || {}).forEach(([k, x]) => { if (ids.has(k)) v[k] = x; }); return { kind: "votes", uid: u, v }; }
+  if (key.startsWith("ratings-")) { const u = key.slice(8); return { kind: "ratings", uid: u, v: S.ratings[u] || {} }; }
   if (key === "secrets") return { kind: "secrets", geminiKey: gemKey(), geminiModel: gemModel() };
   const r = S.recipes[key.slice(2)];
   return r ? { kind: "recipe", ...r } : null;
 }
 function saveLocal(){
   clearTimeout(store.timers.ls);
-  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras })), 200);
+  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras, votes: S.votes, ratings: S.ratings })), 200);
 }
 const itemRef = key => store.fb.F.doc(store.fb.db, "households", store.hid, "items", key);
 function persist(key){
@@ -460,7 +491,7 @@ function persist(key){
       .finally(() => { if (store.seq[key] === my) store.pending.delete(key); });
   }, 350);
 }
-const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("extras"); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
+const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("extras"); if (S.ratings[myId()]) persist("ratings-" + myId()); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
 const saveRecipe = r => { S.recipes[r.id] = r; persist("r-" + r.id); };
 function strip(d){ const o = { ...d }; delete o.kind; return o; }
 function applyDoc(id, d){
@@ -469,17 +500,28 @@ function applyDoc(id, d){
   else if (id === "plan") { const sh = S.plan.shopping; S.plan = { candidates: [], rejected: [], ...strip(d), shopping: d.shopping || sh || null }; }
   else if (id === "shopping") S.plan.shopping = d.list || null;
   else if (id === "extras") S.extras = Array.isArray(d.items) ? d.items : [];
+  else if (d.kind === "votes" && d.uid) S.votes[d.uid] = d.v || {};
+  else if (d.kind === "ratings" && d.uid) S.ratings[d.uid] = d.v || {};
   else if (id === "secrets") { if (d.geminiKey) lsSet(LS_GEM, d.geminiKey); if (d.geminiModel) lsSet(LS_MODEL, d.geminiModel); }
   else if (d.kind === "recipe" && d.id) S.recipes[d.id] = strip(d);
 }
-function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [], shopping: null }; S.recipes = {}; S.extras = []; }
+function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [], shopping: null }; S.recipes = {}; S.extras = []; S.votes = {}; S.ratings = {}; }
 function loadLocal(){
   resetState();
   try {
     const d = JSON.parse(lsGet(LS_KEY) || "null");
-    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], shopping: null, ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; }
+    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], shopping: null, ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; S.votes = d.votes || {}; S.ratings = d.ratings || {}; }
   } catch {}
 }
+const myId = () => (store && store.user && store.user.uid) || "me";
+const familyNames = () => (store.house && store.house.names) || {};
+const familySize = () => (store.house && (store.house.members || []).length) || 1;
+const personName = id => id === myId() ? "You" : (familyNames()[id] || "Family member");
+/* Your rating, then the household average (old single ratings count when nobody has rated per person yet). */
+function myRating(r){ const m = S.ratings[myId()]; return m && m[r.id] != null ? m[r.id] : (Object.values(S.ratings).some(x => x[r.id] != null) ? 0 : (r.rating || 0)); }
+function allRatings(r){ return Object.entries(S.ratings).filter(([, x]) => x[r.id]).map(([u, x]) => [u, x[r.id]]); }
+function avgRating(r){ const a = allRatings(r); return a.length ? Math.round(a.reduce((t, [, n]) => t + n, 0) / a.length) : (r.rating || 0); }
+function voteTally(c){ const up = [], down = []; Object.entries(S.votes).forEach(([u, v]) => { if (v[c.id] === 1) up.push(u); else if (v[c.id] === -1) down.push(u); }); return { up, down, mine: (S.votes[myId()] || {})[c.id] || 0 }; }
 const isEditing = () => { const a = document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName); };
 
 /* invite link: ?join=<household code> */
@@ -665,7 +707,7 @@ async function callModel(model, body){
     if (/api key/i.test(msg) || res.status === 401) throw { code: "bad_key", message: msg, fatal: true };
     if (res.status === 429) throw { code: "rate", message: msg };
     if (res.status === 503 || res.status === 500 || /overloaded|high demand|unavailable/i.test(msg)) throw { code: "busy", message: msg };
-    if (res.status === 400 && /thinking/i.test(msg)) throw { code: "bad_param", message: msg };
+    if (res.status === 400 && /thinking|url_context|tool/i.test(msg)) throw { code: "bad_param", message: msg };
     if (res.status === 404 || res.status === 403 || /model|not found|not supported|no longer available/i.test(msg)) throw { code: "bad_model", message: msg };
     throw { code: "upstream", message: msg || ("HTTP " + res.status) };
   }
@@ -675,11 +717,14 @@ async function callModel(model, body){
   return t;
 }
 /* fast: short, low-stakes answers (meal ideas). Asks Gemini to think less and tries the quick Lite models first. */
-async function askJSON(prompt, { images = null, fast = false } = {}){
+async function askJSON(prompt, { images = null, fast = false, urlContext = false } = {}){
   if (!gemKey()) throw { code: "no_key" };
   const parts = [{ text: prompt }];
   if (images) for (const f of [].concat(images)) parts.push({ inline_data: { mime_type: f.type || "image/jpeg", data: await fileToB64(f) } });
-  const mk = think => JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.9, ...(think ? { thinkingConfig: { thinkingLevel: "low" } } : {}) } });
+  // reading a web page uses Gemini's URL tool, which can't be combined with JSON-only replies
+  const mk = think => JSON.stringify(urlContext
+    ? { contents: [{ role: "user", parts }], tools: [{ url_context: {} }], generationConfig: { temperature: 0.2 } }
+    : { contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.9, ...(think ? { thinkingConfig: { thinkingLevel: "low" } } : {}) } });
   let lastErr = null;
   for (const model of modelOrder(fast)) {
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -693,7 +738,7 @@ async function askJSON(prompt, { images = null, fast = false } = {}){
       } catch (e) {
         lastErr = e;
         if (e.fatal) throw e;
-        if (e.code === "bad_param") { if (think) { noThink[model] = true; continue; } break; }
+        if (e.code === "bad_param") { if (think && !urlContext) { noThink[model] = true; continue; } break; }
         if (e.code === "invalid_json") break;
         if (e.code === "bad_model") { modelBad[model] = Date.now() + 30 * 60e3; break; }
         if (e.code === "busy" && attempt === 0) { await sleep(1200); continue; }
@@ -1054,6 +1099,38 @@ category is one of: ${CATS.join(", ")}. mealType is breakfast, lunch or dinner. 
   S.busy = null; renderSheet();
 }
 
+function fillDraft(o){
+  const d = S.sheet.draft;
+  d.name = o.name || d.name; d.category = CATS.includes(o.category) ? o.category : d.category;
+  d.mealType = TYPES.some(t => t[0] === o.mealType) ? o.mealType : d.mealType;
+  d.servings = num(o.servings, d.servings) || d.servings; d.prepMinutes = num(o.prepMinutes, "") ?? ""; d.cookMinutes = num(o.cookMinutes, "") ?? "";
+  d.ingredients = (o.ingredients || []).map(i => typeof i === "string" ? i : ingText(i)).join("\n");
+  d.steps = (o.steps || []).map(x => typeof x === "string" ? x : (x && (x.text || x.step)) || "").join("\n"); d.tips = o.tips || d.tips || "";
+}
+async function importLink(){
+  if (S.busy) return;
+  const el = document.getElementById("d-url"); const url = (el ? el.value : S.sheet.draft.sourceUrl || "").trim();
+  S.sheet.draft.sourceUrl = url;
+  if (!/^https?:\/\/\S+\.\S+/.test(url)) { toast("Paste the full page address, starting with https://"); return; }
+  if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  S.busy = { kind: "link", label: "Reading the recipe page", sub: "This can take up to a minute." }; renderSheet();
+  try {
+    const o = await askJSON(`Read the recipe on this web page: ${url}
+Copy the recipe faithfully (same ingredients, amounts and steps); don't invent anything that isn't on the page. Skip the life story, ads and comments.
+Reply with only a JSON object shaped like:
+{"name":"...","category":"Chicken","mealType":"dinner","servings":4,"prepMinutes":15,"cookMinutes":30,"ingredients":["2 lb chicken thighs","1 tsp salt"],"steps":["First step.","Second step."],"tips":""}
+category is one of: ${CATS.join(", ")}. mealType is breakfast, lunch or dinner. Use null for numbers the page doesn't give.
+If you can't open the page or it has no recipe, reply {"error":"short reason"}.`, { urlContext: true });
+    if (!o || o.error || !Array.isArray(o.ingredients) || !o.ingredients.length) throw { code: "no_recipe", message: o && o.error };
+    fillDraft(o); S.sheet.linkRead = true;
+    toast("Recipe imported. Check it over, then save.");
+  } catch (e) {
+    console.error(e);
+    toast(e && e.code === "no_recipe" ? "Couldn't find a recipe on that page" + (e.message ? ` (${e.message})` : "") + ". Try another link, or a photo." : aiErr(e));
+  }
+  S.busy = null; renderSheet();
+}
+
 /* ---------- shopping list: items you add yourself ---------- */
 const SECTION_WORDS = [
   ["Produce", /\b(apple|banana|berr|lettuce|spinach|kale|onion|garlic|potato|tomato|pepper|carrot|celery|cucumber|avocado|lemon|lime|orange|grape|melon|broccoli|cauliflower|zucchini|squash|mushroom|cilantro|parsley|basil|herb|ginger|scallion|salad|fruit|veg|cabbage|corn on)/i],
@@ -1066,13 +1143,33 @@ const SECTION_WORDS = [
 ];
 const guessSection = name => (SECTION_WORDS.find(([, re]) => re.test(name)) || ["Other"])[0];
 function parsePasted(text){
-  let lines = String(text || "").split(/\r?\n/);
-  if (lines.filter(l => l.trim()).length === 1 && lines.join("").includes(",")) lines = lines.join("").split(",");
+  // Works with one-item-per-line lists and with Alexa's text message, e.g.
+  // "Here's your Shopping list: milk, eggs, bread and paper towels."
+  const junk = /(reply stop|msg ?& ?data|unsubscribe|alexa app|amazon\.com|^sent from|^from alexa|view (it|your list)|^https?:)/i;
+  const heading = /^((alexa'?s? )?(your )?(shopping( list)?|to-?do( list)?|grocery( list)?|completed( items)?|items?|list|uncheck(ed)?|checked)|sure|ok(ay)?|got it|alright|all right|of course|absolutely|here you go|no problem)$/i;
+  let lines = String(text || "").replace(/https?:\/\/\S+/g, "").split(/\r?\n/);
+  const parts = [];
+  // split into sentences so a trailing "Reply STOP to opt out." doesn't take the items with it
+  lines = lines.flatMap(l => l.split(/(?<=[A-Za-z)][.!?])\s+(?=[A-Z])/));
+  const leadOnly = /^(alexa\s*:?\s*)?(here('?s| is| are)\s+)?(what'?s on\s+)?(your\s+)?(alexa\s+)?(shopping|grocery|to-?do)\s+list\b[^:]*$/i;
+  for (let line of lines) {
+    line = line.trim().replace(/^alexa\s*:\s*/i, ""); if (!line || junk.test(line) || leadOnly.test(line)) continue;
+    // drop a lead-in such as "Here's your Shopping list:" or "You have 4 items on your list:"
+    line = line.replace(/^[^:]{0,80}\b(list|items?)\b[^:]{0,40}:\s*/i, "");
+    if (/\?$/.test(line)) continue;                 // Alexa's follow-up question, e.g. "Want me to add anything?"
+    let bits = line.split(/\s*[,;•·▪●]\s*/).filter(Boolean);
+    if (bits.length > 1) {                       // "a, b and c" -> a | b | c
+      const last = bits.pop().replace(/^(and|&)\s+/i, "");
+      const m = last.match(/^(.+?)\s+(?:and|&)\s+(.+)$/i);
+      bits = m ? [...bits, m[1], m[2]] : [...bits, last];
+    }
+    parts.push(...bits);
+  }
   const out = [], seen = new Set(S.extras.map(x => x.item.toLowerCase()));
-  for (let l of lines) {
-    l = l.replace(/^[\s\-–—•*·◦▪▫●○☐☑✓✔✗□■>]+/, "").replace(/^\d+[.)]\s+/, "").replace(/\s+/g, " ").trim();
-    if (!l || l.length > 120) continue;
-    if (/^(shopping( list)?|to-?do( list)?|completed( items)?|items?|list|uncheck(ed)?|checked)$/i.test(l)) continue;
+  for (let l of parts) {
+    l = l.replace(/^[\s\-–—•*·◦▪▫●○☐☑✓✔✗□■>"'“”]+/, "").replace(/^\d+[.)]\s+/, "").replace(/^(and|&)\s+/i, "")
+         .replace(/["'“”.!]+$/, "").replace(/\s+/g, " ").trim();
+    if (!l || l.length > 120 || heading.test(l)) continue;
     const k = l.toLowerCase(); if (seen.has(k)) continue; seen.add(k);
     out.push(l);
   }
@@ -1237,10 +1334,20 @@ function cand(c){
     ${c.sharesWith && c.sharesWith.length ? `<span class="shares">${IC.leaf}Shares ${esc(c.sharesWith.join(", "))}</span>` : ""}
     <span class="meta">${c.totalMinutes ? `<span>${c.totalMinutes} min</span>` : ""}${c.cuisine ? `<span>${esc(c.cuisine)}</span>` : ""}${c.cost ? `<span class="cost">${esc(c.cost)}</span>` : ""}</span>
     ${c.keyIngredients.length ? `<span class="ings">${esc(c.keyIngredients.join(" · "))}</span>` : ""}
+    ${voteRow(c)}
     <div class="acts">
       <button class="btn small" data-action="reject" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.x}Pass</button>
       <button class="btn small ${isP ? "" : "primary"}" data-action="pick" data-id="${c.id}" ${!isP && full ? "disabled" : ""}>${isP ? "Picked · undo" : IC.check + "Pick"}</button>
     </div></article>`;
+}
+/* Family voting shows once someone else has joined the household. */
+function voteRow(c){
+  if (!store.user || familySize() < 2) return "";
+  const t = voteTally(c);
+  const who = [t.up.length ? "👍 " + t.up.map(personName).join(", ") : "", t.down.length ? "👎 " + t.down.map(personName).join(", ") : ""].filter(Boolean).join(" · ");
+  return `<div class="votes"><button class="vote" data-action="vote" data-id="${c.id}" data-v="1" aria-pressed="${t.mine === 1}" aria-label="Thumbs up">👍<span>${t.up.length || ""}</span></button>
+    <button class="vote" data-action="vote" data-id="${c.id}" data-v="-1" aria-pressed="${t.mine === -1}" aria-label="Thumbs down">👎<span>${t.down.length || ""}</span></button>
+    <span class="who">${esc(who || "Vote so the family can weigh in")}</span></div>`;
 }
 function modelOptions(){
   const cur = gemModel();
@@ -1301,6 +1408,12 @@ function sSettings(){
         <div class="row"><button class="btn small primary" data-action="savekey">Save</button><span class="hint">${needKey ? "Needed to write meals." : store.user ? "Shared with your household." : "Saved on this device."}</span></div>
       </section>
       ${house}
+      <section class="setsec"><h3>Shopping list order</h3>
+        <p class="hint">Put the sections in the order you walk through your store. Drag a row by its handle, or use the arrows.</p>
+        <ol class="aisles" id="aisles">${aisleOrder().map((a, i, arr) => `<li class="aisle-row" data-sec="${esc(a)}"><span class="grip" aria-hidden="true">${IC.grip}</span><span class="an">${esc(a)}</span>
+          <button class="mv" data-action="aisle" data-i="${i}" data-d="-1" ${i === 0 ? "disabled" : ""} aria-label="Move ${esc(a)} up">${IC.up}</button><button class="mv" data-action="aisle" data-i="${i}" data-d="1" ${i === arr.length - 1 ? "disabled" : ""} aria-label="Move ${esc(a)} down">${IC.down}</button></li>`).join("")}</ol>
+        ${S.settings.aisles ? `<div><button class="btn small quiet" data-action="aislereset">Reset to the usual order</button></div>` : ""}
+      </section>
       ${installBox()}
     </div>`;
 }
@@ -1315,9 +1428,9 @@ function vShopping(){
   const sh = S.plan.shopping, stale = sh && sh.builtFor !== shopIds(), pend = pendingRecipes().length;
   const rows = shopRows();
   const head = `<div class="view-head"><div><h2>Shopping list</h2><p>${sh ? `For ${openMeals().length} upcoming meal${openMeals().length === 1 ? "" : "s"} · ${S.settings.people} people` : "Built from the meals in your plan, plus anything you add."}</p></div>
-    ${rows.length ? `<div class="row"><button class="chip" data-action="hidepantry" aria-pressed="${S.hidePantry}">Hide pantry staples</button><button class="btn small" data-action="copy">${IC.copy}Copy list</button></div>` : ""}</div>`;
+    ${rows.length ? `<div class="row"><button class="chip" data-action="hidepantry" aria-pressed="${S.hidePantry}">Hide pantry staples</button><button class="btn small" data-action="copy">${IC.copy}Copy list</button><button class="btn small quiet" data-action="settings" title="Change the order of store sections">Aisle order</button></div>` : ""}</div>`;
   const addBox = `<section class="panel addbox"><label class="lbl" for="addtxt">Add items</label>
-    <textarea id="addtxt" rows="2" placeholder="Type items or paste your Alexa list, one per line"></textarea>
+    <textarea id="addtxt" rows="2" placeholder="Type items, or paste the shopping list text Alexa sends you"></textarea>
     <div class="row"><button class="btn small primary" data-action="addextras">${IC.plus}Add to list</button><span class="hint">Items you add stay on the list when it's rebuilt.</span></div></section>`;
   if (S.busy && S.busy.kind === "shop") return head + busyBox();
   let top = "";
@@ -1328,12 +1441,16 @@ function vShopping(){
   } else if (stale) {
     top = `<div class="notice"><span>${pend ? "Some recipes are still being written." : "Your meal plan changed since this list was made."}</span><button class="btn small" data-action="buildshop" ${pend ? "disabled" : ""}>Update list</button></div>`;
   }
-  const groups = SECTIONS.map(sec => [sec, rows.filter(it => it.section === sec && !(S.hidePantry && it.pantry))]).filter(g => g[1].length);
+  // unchecked items stay in their aisle; checked ones drop to "In the cart" at the bottom
+  const visible = rows.filter(it => !(S.hidePantry && it.pantry));
+  const groups = aisleOrder().map(sec => [sec, visible.filter(it => it.section === sec && !it.got)]).filter(g => g[1].length);
+  const inCart = visible.filter(it => it.got);
+  if (inCart.length) groups.push(["In the cart", inCart, true]);
   const left = sh ? sh.items.filter(i => i.leftover) : [];
   const useUp = sh && ((sh.useItUp && sh.useItUp.length) || left.length) ? `<section class="panel useup"><h3>${IC.leaf}Use it up</h3>
     ${left.length ? `<p class="muted" style="margin:0 0 6px">${left.length} item${left.length > 1 ? "s" : ""} will have some left over after this week's meals.</p>` : ""}
     ${sh.useItUp && sh.useItUp.length ? `<ul>${sh.useItUp.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</section>` : "";
-  return head + top + addBox + useUp + `<div class="shop">${groups.map(([sec, items]) => `<section class="panel aisle"><h3>${esc(sec)}<span>${items.filter(x => !x.got).length} left</span></h3>
+  return head + top + addBox + useUp + `<div class="shop">${groups.map(([sec, items, cart]) => `<section class="panel aisle ${cart ? "cart" : ""}"><h3><b class="sec">${cart ? IC.check : ""}${esc(sec)}</b><span>${cart ? `${items.length} item${items.length > 1 ? "s" : ""}` : `${items.length} left`}</span></h3>
     ${items.map(it => `<div class="item ${it.got ? "got" : ""} ${it.added ? "isx" : ""}"><input type="checkbox" id="chk-${it.key}" data-action="got" data-k="${it.key}" ${it.got ? "checked" : ""}>
       <label class="nm" for="chk-${it.key}">${esc(it.item)}${it.pantry ? '<span class="tag">pantry</span>' : ""}${it.added ? '<span class="tag">added</span>' : ""}${it.meals.length ? `<span class="for">${esc(it.meals.join(", "))}</span>` : ""}${it.leftover ? `<span class="left">${IC.leaf}${esc(it.leftover)} left over</span>` : ""}</label>
       <span class="qty">${esc(it.quantity)}</span>${it.added ? `<button class="rmx" data-action="rmx" data-id="${it.id}" aria-label="Remove ${esc(it.item)}">${IC.x}</button>` : ""}</div>`).join("")}
@@ -1391,8 +1508,10 @@ function sRecipe(){
       <button class="toggle" data-action="inplan" data-id="${r.id}" aria-pressed="${!!r.inPlan}">${IC.cal}${r.inPlan ? "In this week's plan" : "Add to this week"}</button>
     </div>
     <div style="margin-top:16px"><span class="lbl">Your rating</span>
-      <div class="stars" role="group" aria-label="Rate this recipe">${[1,2,3,4,5].map(n => `<button class="${n <= r.rating ? "on" : ""}" data-action="rate" data-id="${r.id}" data-v="${n}" aria-label="${n} star${n > 1 ? "s" : ""}" aria-pressed="${n === r.rating}">${IC.star}</button>`).join("")}</div>
-      <span class="hint">4 or 5 stars saves it to your favorites.</span></div>
+      <div class="stars" role="group" aria-label="Rate this recipe">${[1,2,3,4,5].map(n => `<button class="${n <= myRating(r) ? "on" : ""}" data-action="rate" data-id="${r.id}" data-v="${n}" aria-label="${n} star${n > 1 ? "s" : ""}" aria-pressed="${n === myRating(r)}">${IC.star}</button>`).join("")}</div>
+      ${(() => { const others = allRatings(r).filter(([u]) => u !== myId()); return others.length ? `<span class="famrate">Family: ${others.map(([u, n]) => `${esc(personName(u))} ${"★".repeat(n)}`).join(" · ")}${allRatings(r).length > 1 ? ` · average ${avgRating(r)}` : ""}</span>` : ""; })()}
+      <span class="hint">Each person rates on their own phone. 4 or 5 stars saves it to your favorites.</span></div>
+    ${r.sourceUrl ? `<p class="hint" style="margin:12px 0 0">From <a href="${esc(r.sourceUrl)}" target="_blank" rel="noopener">${esc((() => { try { return new URL(r.sourceUrl).hostname.replace(/^www\./, ""); } catch { return "the original page"; } })())}</a></p>` : ""}
     ${r.pending ? `<div class="busy" style="margin-top:16px"><span class="spin"></span><div>Writing the full recipe…<small>It appears here in a moment.</small></div></div>` : ""}
     ${r.writeFailed ? `<div class="notice" style="margin-top:16px"><span>The recipe couldn't be written.</span><button class="btn small primary" data-action="retrywrite" data-id="${r.id}">Try again</button></div>` : ""}
     <div class="recipe-cols" ${r.pending || r.writeFailed ? "hidden" : ""}>
@@ -1405,8 +1524,13 @@ function sRecipe(){
 function sAdd(){
   const d = S.sheet.draft;
   return `<div class="sheet-head"><h2>Add a recipe</h2><button class="x" data-action="close" aria-label="Close">${IC.x}</button></div>
-    <p class="muted" style="margin:0 0 16px">Type it in, or start from a photo of a recipe card or cookbook page.</p>
+    <p class="muted" style="margin:0 0 16px">Type it in, or start from a link or a photo of a recipe card.</p>
     <div class="stack">
+      <div class="photo-drop">
+        <label class="lbl" for="d-url">From a link</label>
+        <div class="joinrow"><input type="url" id="d-url" data-bind="draft.sourceUrl" value="${esc(d.sourceUrl || "")}" placeholder="Paste a recipe page address" autocomplete="off" inputmode="url">
+          ${S.busy && S.busy.kind === "link" ? "" : `<button class="btn small primary" data-action="importlink">Import</button>`}</div>
+        ${S.busy && S.busy.kind === "link" ? busyBox() : `<span class="hint">Gemini reads the page and fills in the form below for you to check.</span>`}</div>
       <div class="photo-drop">
         ${S.sheet.photos.length ? `<div class="thumbs">${S.sheet.photos.map((p, i) => `<span class="thumb"><img src="${p.url}" alt="Recipe photo ${i + 1}"><button data-action="rmphoto" data-i="${i}" aria-label="Remove photo ${i + 1}">${IC.x}</button></span>`).join("")}</div>` : ""}
         <div class="row">
@@ -1501,9 +1625,17 @@ document.addEventListener("click", async e => {
     case "fav": { const r = S.recipes[id]; r.favorite = !r.favorite; saveRecipe(r); render(); break; }
     case "inplan": { const r = S.recipes[id]; r.inPlan = !r.inPlan; if (r.inPlan) { r.done = false; r.addedAt = Date.now(); } saveRecipe(r); syncCandidates(); render();
       const n = weekCount(); toast(r.inPlan ? `Added to this week (${n} of ${s.meals} planned).` + (n > s.meals ? " That's more than your plan size." : "") : "Removed from this week's plan."); break; }
-    case "rate": { const r = S.recipes[id]; const n = Number(v); r.rating = r.rating === n ? 0 : n;
-      if (r.rating >= 4 && !r.favorite) { r.favorite = true; toast("Saved to favorites."); }
-      saveRecipe(r); render(); break; }
+    case "rate": { const r = S.recipes[id]; const n = Number(v); const me = myId();
+      const mine = { ...(S.ratings[me] || {}) };
+      if (myRating(r) === n) delete mine[r.id]; else mine[r.id] = n;
+      S.ratings[me] = mine; persist("ratings-" + me);
+      r.rating = allRatings(r).length ? avgRating(r) : 0;        // household average shown on tiles
+      if (mine[r.id] >= 4 && !r.favorite) { r.favorite = true; toast("Saved to favorites."); }
+      saveRecipe(r);
+      render(); break; }
+    case "vote": { const me = myId(); const mine = { ...(S.votes[me] || {}) }; const n = Number(v);
+      if (mine[id] === n) delete mine[id]; else mine[id] = n;
+      S.votes[me] = mine; persist("votes-" + me); render(); break; }
     case "delete": if (S.armed !== "del-" + id) { S.armed = "del-" + id; renderSheet(); break; }
       S.armed = null; delete S.recipes[id]; persist("r-" + id); syncCandidates(); S.sheet = null; render(); toast("Recipe deleted."); break;
     case "clear-done": if (S.armed !== "clear") { S.armed = "clear"; render(); break; }
@@ -1512,7 +1644,7 @@ document.addEventListener("click", async e => {
     case "rebuild": await buildShopping(); render(); break;
     case "copy": {
       const rows = shopRows(); if (!rows.length) break;
-      const txt = SECTIONS.map(sec => { const its = rows.filter(i => i.section === sec && !i.got && !(S.hidePantry && i.pantry)); return its.length ? sec.toUpperCase() + "\n" + its.map(i => `- ${i.item}${i.quantity ? " (" + i.quantity + ")" : ""}`).join("\n") : ""; }).filter(Boolean).join("\n\n");
+      const txt = aisleOrder().map(sec => { const its = rows.filter(i => i.section === sec && !i.got && !(S.hidePantry && i.pantry)); return its.length ? sec.toUpperCase() + "\n" + its.map(i => `- ${i.item}${i.quantity ? " (" + i.quantity + ")" : ""}`).join("\n") : ""; }).filter(Boolean).join("\n\n");
       try { await navigator.clipboard.writeText(txt); toast("Shopping list copied."); }
       catch { const t = document.createElement("textarea"); t.value = txt; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); toast(ok ? "Shopping list copied." : "Couldn't copy the list on this device."); }
       break; }
@@ -1521,7 +1653,10 @@ document.addEventListener("click", async e => {
     case "add": S.sheet = { type: "add", draft: newDraft(), photos: [] }; renderSheet(); break;
     case "draft-plan": S.sheet.draft.addToPlan = !S.sheet.draft.addToPlan; renderSheet(); break;
     case "draft-fav": S.sheet.draft.favorite = !S.sheet.draft.favorite; renderSheet(); break;
+    case "aisle": { const o = aisleOrder(); const i = Number(el.dataset.i), j = i + Number(el.dataset.d); if (j < 0 || j >= o.length) break; [o[i], o[j]] = [o[j], o[i]]; S.settings.aisles = o; persist("settings"); renderSheet(); break; }
+    case "aislereset": delete S.settings.aisles; persist("settings"); renderSheet(); break;
     case "readphoto": readPhoto(); break;
+    case "importlink": importLink(); break;
     case "save-new": {
       const d = S.sheet.draft;
       if (!d.name.trim()) { toast("Give the recipe a name first."); document.getElementById("d-name")?.focus(); break; }
@@ -1529,7 +1664,7 @@ document.addEventListener("click", async e => {
         servings: num(d.servings, s.people) || s.people, prepMinutes: num(d.prepMinutes), cookMinutes: num(d.cookMinutes),
         ingredients: d.ingredients.split("\n").map(x => x.trim()).filter(Boolean).map(parseIngLine),
         steps: d.steps.split("\n").map(x => x.trim()).filter(Boolean), tips: d.tips.trim(),
-        source: S.sheet.photos.length ? "photo" : "personal", rating: 0, favorite: !!d.favorite, done: false, inPlan: !!d.addToPlan, addedAt: Date.now(), createdAt: Date.now() };
+        source: d.sourceUrl && S.sheet.linkRead ? "link" : S.sheet.photos.length ? "photo" : "personal", sourceUrl: d.sourceUrl && S.sheet.linkRead ? d.sourceUrl : "", rating: 0, favorite: !!d.favorite, done: false, inPlan: !!d.addToPlan, addedAt: Date.now(), createdAt: Date.now() };
       saveRecipe(r); S.sheet.photos.forEach(p => URL.revokeObjectURL(p.url)); S.sheet = { type: "recipe", id: r.id, from: S.view }; render(); toast(r.favorite ? "Recipe saved to your favorites." : "Recipe saved to your box."); break; }
   }
 });
@@ -1570,6 +1705,33 @@ document.addEventListener("toggle", e => {
   if (e.target.id === "fold-conn") S.open.conn = e.target.open;
   if (e.target.id === "fold-house") S.open.house = e.target.open;
 }, true);
+
+/* ---------- drag to reorder store sections (mouse and touch) ---------- */
+let aisleDrag = null;
+document.addEventListener("pointerdown", e => {
+  const grip = e.target.closest && e.target.closest(".grip"); if (!grip) return;
+  const row = grip.closest(".aisle-row"), list = row && row.parentElement; if (!list) return;
+  e.preventDefault(); row.classList.add("dragging");
+  aisleDrag = { row, list, id: e.pointerId };
+});
+document.addEventListener("pointermove", e => {
+  if (!aisleDrag || e.pointerId !== aisleDrag.id) return;
+  e.preventDefault();
+  const { row, list } = aisleDrag;
+  const rows = [...list.children].filter(r => r !== row);
+  const after = rows.find(r => { const b = r.getBoundingClientRect(); return e.clientY < b.top + b.height / 2; });
+  if ((after || null) !== row.nextElementSibling) list.insertBefore(row, after || null);
+}, { passive: false });
+const endAisleDrag = e => {
+  if (!aisleDrag || (e && e.pointerId !== aisleDrag.id)) return;
+  const { row, list } = aisleDrag; aisleDrag = null;
+  row.classList.remove("dragging");
+  const order = [...list.children].map(r => r.dataset.sec);
+  if (order.join("|") !== aisleOrder().join("|")) { S.settings.aisles = order; persist("settings"); }
+  renderSheet();
+};
+document.addEventListener("pointerup", endAisleDrag);
+document.addEventListener("pointercancel", endAisleDrag);
 
 /* ---------- start ---------- */
 async function init(){
