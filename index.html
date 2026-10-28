@@ -258,6 +258,47 @@ details.settings[open]>summary{margin-bottom:16px}
 .sgroup>h3{font-size:1.1rem;margin-bottom:10px;display:flex;align-items:baseline;gap:8px}
 .sgroup>h3 span{font-family:var(--f-body);font-size:.85rem;font-weight:400;color:var(--muted)}
 .searchtips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+/* round 2: weeks, editing, history */
+.top{display:block}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0}
+.weekbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;background:var(--hdr-soft);border-radius:12px;padding:5px;max-width:520px}
+.weekbar button{width:40px;height:40px;border:0;border-radius:9px;background:rgba(255,255,255,.14);color:var(--hdr-ink);display:grid;place-items:center;flex:none;padding:0}
+.weekbar button svg{width:18px;height:18px}
+.weekbar button:disabled{background:none;opacity:.35;cursor:default}
+.weekbar .wl{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;text-align:center}
+.weekbar .wl b{font-size:.98rem;color:var(--hdr-ink)}
+.weekbar .wl span{font-size:.78rem;color:var(--hdr-muted)}
+.wdots{display:flex;gap:4px;justify-content:center}
+.wdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35)}
+.wdots i.on{background:#fff}
+@media (min-width:860px){.weekbar{margin-inline:auto}}
+.weekpill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.85rem;vertical-align:2px}
+.combo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:var(--r);background:var(--accent-soft);margin-bottom:16px;font-size:.92rem}
+.pastwk{margin-bottom:14px}
+.pastwk h3{font-size:1.05rem;display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
+.pastwk h3 span{font-family:var(--f-body);font-size:.82rem;font-weight:400;color:var(--muted)}
+.pastrow{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.pastrow:first-of-type{border-top:0}
+.pastrow .mk{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--line);color:transparent}
+.pastrow .mk.y{background:var(--teal);border-color:var(--teal);color:var(--teal-ink)}
+.pastrow .mk svg{width:13px;height:13px}
+.pastrow .pn{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.pastrow .pn small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.editrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.askbox{margin-top:12px;padding:14px;border-radius:var(--r);background:var(--sunk);display:flex;flex-direction:column;gap:10px}
+.askbox .joinrow input{min-height:44px}
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.quick .chip{min-height:34px;font-size:.85rem;padding:5px 12px}
+.edited{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:var(--r);background:var(--teal-soft);font-size:.92rem}
+.edited b{color:var(--teal-text)}
+.hist{margin-top:18px}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.hrow:first-child{border-top:0}
+.hrow .ht{font-weight:700;font-size:.92rem}
+.hrow .hn{display:block;font-size:.84rem;color:var(--muted);font-weight:400}
+.hrow .hb{display:flex;gap:6px}
+.hrow.cur .ht::after{content:"Current";margin-left:8px;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--teal-soft);color:var(--teal-text)}
+.previewbar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:var(--r);background:var(--gold-soft);font-size:.92rem}
 /* additions for the standalone build */
 html,body{margin:0}
 body{-webkit-text-size-adjust:100%}
@@ -294,7 +335,7 @@ code{font-size:.85em;background:var(--sunk);padding:1px 5px;border-radius:5px}
 .useup h3 svg{width:20px;height:20px;color:var(--accent)}
 .useup ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;max-width:70ch}
 /* header: never wider than the phone */
-.app{overflow-x:clip}
+html,body{overflow-x:clip}
 .top{flex-wrap:nowrap;min-width:0}
 .brand{min-width:0;flex-wrap:wrap;row-gap:0}
 .top-right{flex:none}
@@ -377,10 +418,10 @@ window.addEventListener("error", function (e) {
 </head>
 <body>
 <div class="app" id="app">
-  <header class="top">
-    <div class="brand"><svg class="logo" viewBox="0 0 256 256" aria-hidden="true"><defs><linearGradient id="ybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2DD4BF"/><stop offset="1" stop-color="#0E7C70"/></linearGradient></defs><rect width="256" height="256" rx="58" fill="url(#ybg)"/><rect x="76" y="38" width="124" height="180" rx="18" fill="none" stroke="#fff" stroke-width="9"/><g fill="#fff"><rect x="60" y="68" width="30" height="11" rx="5.5"/><rect x="60" y="106" width="30" height="11" rx="5.5"/><rect x="60" y="144" width="30" height="11" rx="5.5"/><rect x="60" y="182" width="30" height="11" rx="5.5"/><path transform="translate(104 73) scale(.55)" d="M4 6a2.5 2.5 0 0 1 5 0V36H12.3V6a2.5 2.5 0 0 1 5 0V36H22.7V6a2.5 2.5 0 0 1 5 0V36H31V6a2.5 2.5 0 0 1 5 0V40C36 52 28 58 23 62L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 62C12 58 4 52 4 40Z"/><path transform="translate(128 73) scale(.55)" d="M20 2C30 2 37 14 37 30C37 44 29 55 23 58L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 58C11 55 3 44 3 30C3 14 10 2 20 2Z"/><path transform="translate(152 73) scale(.55)" d="M25 3C14 10 9 40 9 84C9 95 13 100 17 102L13 186a7 7 0 0 0 14 0L29 102V8C29 4 27 2 25 3Z"/></g></svg><h1>YeahBuddy <span>Meals</span></h1><span class="wk" id="wk"></span></div>
+  <header class="top"><div class="toprow">
+    <div class="brand"><svg class="logo" viewBox="0 0 256 256" aria-hidden="true"><defs><linearGradient id="ybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2DD4BF"/><stop offset="1" stop-color="#0E7C70"/></linearGradient></defs><rect width="256" height="256" rx="58" fill="url(#ybg)"/><rect x="76" y="38" width="124" height="180" rx="18" fill="none" stroke="#fff" stroke-width="9"/><g fill="#fff"><rect x="60" y="68" width="30" height="11" rx="5.5"/><rect x="60" y="106" width="30" height="11" rx="5.5"/><rect x="60" y="144" width="30" height="11" rx="5.5"/><rect x="60" y="182" width="30" height="11" rx="5.5"/><path transform="translate(104 73) scale(.55)" d="M4 6a2.5 2.5 0 0 1 5 0V36H12.3V6a2.5 2.5 0 0 1 5 0V36H22.7V6a2.5 2.5 0 0 1 5 0V36H31V6a2.5 2.5 0 0 1 5 0V40C36 52 28 58 23 62L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 62C12 58 4 52 4 40Z"/><path transform="translate(128 73) scale(.55)" d="M20 2C30 2 37 14 37 30C37 44 29 55 23 58L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 58C11 55 3 44 3 30C3 14 10 2 20 2Z"/><path transform="translate(152 73) scale(.55)" d="M25 3C14 10 9 40 9 84C9 95 13 100 17 102L13 186a7 7 0 0 0 14 0L29 102V8C29 4 27 2 25 3Z"/></g></svg><h1>YeahBuddy <span>Meals</span></h1></div>
     <div class="top-right"><nav class="tabs" id="tabs" aria-label="Sections"></nav><span id="acct"></span></div>
-  </header>
+  </div><div id="weekbar"></div></header>
   <main id="view"><div class="loading"><span class="spin"></span>Loading your meals…</div></main>
 </div>
 <div id="sheetRoot"></div>
@@ -453,6 +494,10 @@ const IC = {
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+  hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 8v4l3 2"/></svg>',
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
 };
 
@@ -488,18 +533,35 @@ const S = {
   view: null, sheet: null, busy: null, loaded: false, armed: null,
   open: { settings: false, conn: false, house: false },
   filter: { tab: "all", cat: "", q: "" }, hidePantry: false,
-  search: { q: "", ran: "", box: [], ai: [], busy: false }
+  search: { q: "", ran: "", box: [], ai: [], busy: false },
+  wk: 0,          // week being viewed: 0 = this week, 1-2 = ahead, -1 = past weeks
+  shopW: {},      // { weekKey: shopping list } (a combined list carries weeks: [k, next])
+  past: {}        // { weekKey: [{ id, name, category, done }] }
 };
 const recipesArr = () => Object.values(S.recipes);
-const planRecipes = () => recipesArr().filter(r => r.inPlan).sort((a, b) => (a.done - b.done) || (a.addedAt || 0) - (b.addedAt || 0));
-const openMeals = () => planRecipes().filter(r => !r.done);
+/* ---------- weeks (Sunday to Saturday, keyed by the Sunday's date) ---------- */
+const dkey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const keyDate = k => { const [y, m, d] = String(k).split("-").map(Number); return new Date(y, m - 1, d); };
+const curKey = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); return dkey(d); };
+const addWeeks = (k, n) => { const d = keyDate(k); d.setDate(d.getDate() + 7 * n); return dkey(d); };
+const MAX_AHEAD = 2;
+const viewKey = () => addWeeks(curKey(), clamp(S.wk, 0, MAX_AHEAD));
+const weekDiff = k => Math.round((keyDate(k) - keyDate(curKey())) / (7 * 864e5));
+const mdy = d => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function weekRange(k){ const a = keyDate(k), b = keyDate(k); b.setDate(b.getDate() + 6); return a.getMonth() === b.getMonth() ? `${mdy(a)} – ${b.getDate()}` : `${mdy(a)} – ${mdy(b)}`; }
+const weekName = k => { const n = weekDiff(k); return n === 0 ? "This week" : n === 1 ? "Next week" : "Week of " + mdy(keyDate(k)); };
+const weekLower = k => { const w = weekName(k); return w.startsWith("Week") ? "the week of " + mdy(keyDate(k)) : w.toLowerCase(); };
+const weekOfR = r => r.planWeek || curKey();
+const allPlanned = () => recipesArr().filter(r => r.inPlan);
+const planRecipes = (k = viewKey()) => recipesArr().filter(r => r.inPlan && weekOfR(r) === k).sort((a, b) => (a.done - b.done) || (a.addedAt || 0) - (b.addedAt || 0));
+const openMeals = (k = viewKey()) => planRecipes(k).filter(r => !r.done);
 const picked = () => S.plan.candidates.filter(c => c.status === "picked");
 const laterList = () => Array.isArray(S.plan.later) ? S.plan.later : [];
 /* Sunday 00:00 of this week, local time. */
 function weekStart(){ const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); return d.getTime(); }
 const TWO_WEEKS = 14 * 864e5;
 /* Meals made or planned in the last 2 weeks: new ideas should not repeat them. */
-const recentMeals = () => recipesArr().filter(r => (r.doneAt && Date.now() - r.doneAt < TWO_WEEKS) || (r.inPlan && r.addedAt && Date.now() - r.addedAt < TWO_WEEKS)).map(r => r.name);
+const recentMeals = () => recipesArr().filter(r => (r.doneAt && Date.now() - r.doneAt < TWO_WEEKS) || r.inPlan).map(r => r.name);
 /* Everything in this week's plan counts as picked, including meals added from the Recipes page. */
 const weekCount = () => planRecipes().length;
 const pendingRecipes = () => planRecipes().filter(r => r.pending);
@@ -511,7 +573,8 @@ const store = { mode: "local", fb: null, fbError: "", user: null, hid: null, hou
 function docData(key){
   if (key === "settings") return { kind: "settings", ...S.settings };
   if (key === "plan") { const p = { ...S.plan }; delete p.shopping; return { kind: "plan", ...p }; }
-  if (key === "shopping") return { kind: "shopping", list: S.plan.shopping || null };
+  if (key === "shopping") return { kind: "shopping", weeks: S.shopW };
+  if (key === "past") return { kind: "past", weeks: S.past };
   if (key === "extras") return { kind: "extras", items: S.extras };
   if (key.startsWith("votes-")) { const u = key.slice(6); const ids = new Set(S.plan.candidates.map(c => c.id)); const v = {}; Object.entries(S.votes[u] || {}).forEach(([k, x]) => { if (ids.has(k)) v[k] = x; }); return { kind: "votes", uid: u, v }; }
   if (key.startsWith("ratings-")) { const u = key.slice(8); return { kind: "ratings", uid: u, v: S.ratings[u] || {} }; }
@@ -521,7 +584,7 @@ function docData(key){
 }
 function saveLocal(){
   clearTimeout(store.timers.ls);
-  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras, votes: S.votes, ratings: S.ratings })), 200);
+  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras, votes: S.votes, ratings: S.ratings, shopW: S.shopW, past: S.past })), 200);
 }
 const itemRef = key => store.fb.F.doc(store.fb.db, "households", store.hid, "items", key);
 function persist(key){
@@ -540,26 +603,33 @@ function persist(key){
       .finally(() => { if (store.seq[key] === my) store.pending.delete(key); });
   }, 350);
 }
-const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("extras"); if (S.ratings[myId()]) persist("ratings-" + myId()); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
+const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("past"); persist("extras"); if (S.ratings[myId()]) persist("ratings-" + myId()); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
 const saveRecipe = r => { S.recipes[r.id] = r; persist("r-" + r.id); };
 function strip(d){ const o = { ...d }; delete o.kind; return o; }
 function applyDoc(id, d){
-  if (!d) { if (id.startsWith("r-")) delete S.recipes[id.slice(2)]; if (id === "shopping") S.plan.shopping = null; return; }
+  if (!d) { if (id.startsWith("r-")) delete S.recipes[id.slice(2)]; if (id === "shopping") S.shopW = {}; return; }
   if (id === "settings") S.settings = { ...clone(DEFAULT_SETTINGS), ...strip(d) };
-  else if (id === "plan") { const sh = S.plan.shopping; S.plan = { candidates: [], rejected: [], ...strip(d), shopping: d.shopping || sh || null }; }
-  else if (id === "shopping") S.plan.shopping = d.list || null;
+  else if (id === "plan") { S.plan = { candidates: [], rejected: [], ...strip(d) }; delete S.plan.shopping; }
+  else if (id === "shopping") S.shopW = d.weeks ? d.weeks : migrateShop(d.list);
+  else if (id === "past") S.past = d.weeks || {};
   else if (id === "extras") S.extras = Array.isArray(d.items) ? d.items : [];
   else if (d.kind === "votes" && d.uid) S.votes[d.uid] = d.v || {};
   else if (d.kind === "ratings" && d.uid) S.ratings[d.uid] = d.v || {};
   else if (id === "secrets") { if (d.geminiKey) lsSet(LS_GEM, d.geminiKey); if (d.geminiModel) lsSet(LS_MODEL, d.geminiModel); }
   else if (d.kind === "recipe" && d.id) S.recipes[d.id] = strip(d);
 }
-function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [], shopping: null }; S.recipes = {}; S.extras = []; S.votes = {}; S.ratings = {}; }
+function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [] }; S.recipes = {}; S.extras = []; S.votes = {}; S.ratings = {}; S.shopW = {}; S.past = {}; }
+/* Lists saved before weeks existed belong to this week. */
+function migrateShop(list){
+  if (!list || !Array.isArray(list.items)) return {};
+  const k = curKey(), b = String(list.builtFor || "");
+  return { [k]: { ...list, weeks: [k], builtFor: b && !b.includes(":") ? b.split(",").map(x => x + ":0").join(",") : b } };
+}
 function loadLocal(){
   resetState();
   try {
     const d = JSON.parse(lsGet(LS_KEY) || "null");
-    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], shopping: null, ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; S.votes = d.votes || {}; S.ratings = d.ratings || {}; }
+    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; S.votes = d.votes || {}; S.ratings = d.ratings || {}; S.shopW = d.shopW || migrateShop(S.plan.shopping); S.past = d.past || {}; delete S.plan.shopping; }
   } catch {}
 }
 const myId = () => (store && store.user && store.user.uid) || "me";
@@ -905,7 +975,7 @@ async function suggest(n, { fresh = false, withFavorites = false } = {}){
     S.plan.candidates = [...S.plan.candidates, ...favs];
     n -= favs.length;
     const keep = S.plan.candidates;
-    const exclude = () => [...new Set([...S.plan.candidates.map(c => c.name), ...S.plan.rejected, ...planRecipes().map(r => r.name), ...laterList().map(x => x.name)])].slice(-150);
+    const exclude = () => [...new Set([...S.plan.candidates.map(c => c.name), ...S.plan.rejected, ...allPlanned().map(r => r.name), ...laterList().map(x => x.name)])].slice(-150);
     const seen = new Set(exclude().map(x => x.toLowerCase()));
     const added = [];
     for (let attempt = 0; attempt < 2 && added.length < n; attempt++) {
@@ -1016,11 +1086,12 @@ function resumeWrites(){
 }
 function pickCandidate(c){
   const s = S.settings;
-  if (weekCount() >= s.meals) { toast(`This week already has ${s.meals} meal${s.meals > 1 ? "s" : ""}. Undo one or raise "Meals to plan" in Plan settings.`); return; }
+  if (weekCount() >= s.meals) { toast(`${weekName(viewKey())} already has ${s.meals} meal${s.meals > 1 ? "s" : ""}. Undo one, switch weeks, or raise "Meals to plan" in Plan settings.`); return; }
   if (!gemKey() && !(c.favId && S.recipes[c.favId])) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
   let r = c.favId && S.recipes[c.favId];
   if (r) { r.inPlan = true; r.done = false; r.addedAt = Date.now(); }
   else { r = newPlaceholder(c); queueWrites(); }
+  r.planWeek = viewKey();
   saveRecipe(r);
   c.status = "picked"; c.recipeId = r.id; c.pickedAt = Date.now();
   persist("plan");
@@ -1050,6 +1121,26 @@ function syncCandidates(){
   if (S.plan.candidates.some(c => c.drop)) { S.plan.candidates = S.plan.candidates.filter(c => !c.drop); changed = true; }
   if (changed) persist("plan");
 }
+/* Finished weeks move to Past weeks; their lists are cleared and unbought added items carry over. */
+function archiveWeeks(){
+  const cur = curKey(); let moved = 0, shopChanged = false, extrasChanged = false;
+  for (const r of allPlanned()) {
+    if (!r.planWeek) { r.planWeek = cur; saveRecipe(r); continue; }
+    if (r.planWeek >= cur) continue;
+    const wk = (S.past[r.planWeek] = S.past[r.planWeek] || []);
+    if (!wk.some(x => x.id === r.id)) wk.push({ id: r.id, name: r.name, category: r.category, done: !!r.done });
+    r.inPlan = false; r.done = false; saveRecipe(r); moved++;
+  }
+  for (const [k, l] of Object.entries(S.shopW)) if (Math.max(...(l.weeks || [k]).map(w => keyDate(w).getTime())) < keyDate(cur).getTime()) { delete S.shopW[k]; shopChanged = true; }
+  const ex = S.extras.filter(x => !(x.week && x.week < cur && x.got)).map(x => x.week && x.week < cur ? { ...x, week: cur } : x);
+  if (JSON.stringify(ex) !== JSON.stringify(S.extras)) { S.extras = ex; extrasChanged = true; }
+  const keys = Object.keys(S.past).sort().reverse();
+  if (keys.length > 12) { keys.slice(12).forEach(k => delete S.past[k]); moved++; }
+  if (moved) { persist("past"); syncCandidates(); }
+  if (shopChanged) persist("shopping");
+  if (extrasChanged) persist("extras");
+  S.archivedFor = cur;
+}
 /* One-time: recipes the household typed or uploaded count as favorites. */
 function migrateOnce(){
   if (S.settings.favMigrated) return;
@@ -1077,7 +1168,7 @@ async function runSearch(more = false){
   if (!gemKey()) { render(); if (!S.search.box.length) { openSettings(); toast(aiErr({ code: "no_key" })); } else toast("Add a Gemini key in Settings to search for new ideas too."); return; }
   S.search.busy = true; render();
   try {
-    const ex = [...new Set([...S.search.ai.map(c => c.name), ...S.search.box.map(c => c.name), ...S.plan.rejected.slice(-60), ...planRecipes().map(r => r.name), ...laterList().map(x => x.name)])];
+    const ex = [...new Set([...S.search.ai.map(c => c.name), ...S.search.box.map(c => c.name), ...S.plan.rejected.slice(-60), ...allPlanned().map(r => r.name), ...laterList().map(x => x.name)])];
     const seen = new Set([...ex, ...recipesArr().map(r => r.name)].map(x => x.toLowerCase()));
     const got = await fetchIdeas(6, ex, { query: S.search.ran });
     if (S.search.ran !== q && !more) return;
@@ -1106,7 +1197,7 @@ async function buildPlan(){
   // favorites already have a recipe: put them straight into the plan
   for (const c of all.filter(c => c.favId)) {
     const r = S.recipes[c.favId];
-    if (r) { r.inPlan = true; r.done = false; r.addedAt = Date.now(); saveRecipe(r); S.plan.candidates = S.plan.candidates.filter(x => x.id !== c.id); done++; }
+    if (r) { r.inPlan = true; r.planWeek = viewKey(); r.done = false; r.addedAt = Date.now(); saveRecipe(r); S.plan.candidates = S.plan.candidates.filter(x => x.id !== c.id); done++; }
   }
   const list = all.filter(c => !c.favId || !S.recipes[c.favId]);
   const week = [...all.map(c => c.name + (c.keyIngredients.length ? " (" + c.keyIngredients.join(", ") + ")" : "")), ...openMeals().filter(r => !all.some(c => c.favId === r.id)).map(r => r.name)];
@@ -1134,7 +1225,16 @@ async function buildPlan(){
   render();
 }
 
-const shopIds = () => openMeals().map(r => r.id).sort().join(",");
+/* A list is up to date when it was built from the same meals at the same recipe versions. */
+const shopSig = weeks => weeks.flatMap(k => openMeals(k)).map(r => r.id + ":" + (r.rev || 0)).sort().join(",");
+function shopFor(k = viewKey()){
+  if (S.shopW[k]) return { list: S.shopW[k], owner: k };
+  const pk = addWeeks(k, -1), prev = S.shopW[pk];
+  if (prev && (prev.weeks || []).includes(k)) return { list: prev, owner: pk };
+  return { list: null, owner: k };
+}
+const listWeeks = sf => sf.list ? (sf.list.weeks || [sf.owner]) : [sf.owner];
+const shopFresh = sf => !!sf.list && sf.list.builtFor === shopSig(listWeeks(sf));
 function localShopping(recipes){
   const m = new Map();
   recipes.forEach(r => r.ingredients.forEach(i => {
@@ -1143,12 +1243,15 @@ function localShopping(recipes){
   }));
   return [...m.values()].map(e => ({ section: "Other", item: e.item, quantity: e.q.join(" + "), meals: [...e.meals], pantry: false, got: false }));
 }
-async function buildShopping(){
-  const recipes = openMeals();
-  if (!recipes.length) { S.plan.shopping = null; persist("shopping"); return; }
+async function buildShopping(k = viewKey(), mode = "keep"){
+  const sf = shopFor(k);
+  let owner = sf.owner, weeks = listWeeks(sf);
+  if (mode === "combine") { owner = k; weeks = [k, addWeeks(k, 1)]; delete S.shopW[addWeeks(k, 1)]; }
+  const recipes = weeks.flatMap(w => openMeals(w));
+  if (!recipes.length) { delete S.shopW[owner]; persist("shopping"); return; }
   S.busy = { kind: "shop", label: "Building your shopping list", sub: "Combining ingredients across meals." }; render();
   const prompt =
-`Make one combined grocery shopping list for these recipes. Add up the same ingredient across recipes and turn amounts into what a shopper buys (for example "2 lb", "1 bunch", "1 (14 oz) can", "3 medium").
+`Make one combined grocery shopping list for these recipes${weeks.length > 1 ? " (two weeks of meals bought in one trip; keep very perishable items like fresh fish and soft herbs in amounts that still make sense)" : ""}. Add up the same ingredient across recipes and turn amounts into what a shopper buys (for example "2 lb", "1 bunch", "1 (14 oz) can", "3 medium").
 ${recipes.map(r => "## " + r.name + "\n" + r.ingredients.map(i => "- " + ingText(i)).join("\n")).join("\n\n")}
 
 ${lowWaste() ? `Buy the smallest amounts that cover the recipes, in sizes stores actually sell.
@@ -1170,7 +1273,7 @@ section is one of: ${SECTIONS.join(", ")}. Set pantry to true for staples most k
     items = localShopping(recipes);
     toast("Couldn't sort the list by aisle, so here's a plain combined list.");
   }
-  S.plan.shopping = { items, useItUp, builtFor: shopIds(), at: Date.now() }; persist("shopping");
+  S.shopW[owner] = { items, useItUp, builtFor: shopSig(weeks), at: Date.now(), weeks }; persist("shopping");
   S.busy = null;
 }
 
@@ -1276,7 +1379,8 @@ function parsePasted(text){
 async function addExtras(text){
   const names = parsePasted(text);
   if (!names.length) { toast("Nothing to add. Paste or type items, one per line."); return 0; }
-  const added = names.map(n => ({ id: uid(), item: n, quantity: "", section: guessSection(n), got: false, added: true }));
+  const wk = shopFor().owner;
+  const added = names.map(n => ({ id: uid(), item: n, quantity: "", section: guessSection(n), got: false, added: true, week: wk }));
   S.extras = [...S.extras, ...added]; persist("extras"); render();
   toast(`Added ${added.length} item${added.length > 1 ? "s" : ""} to the list.`);
   if (!gemKey()) return added.length;
@@ -1312,12 +1416,22 @@ function render(){
   const tabs = [["plan","Plan",IC.plan,n],["generate","Suggest",IC.gen,0],["search","Search",IC.search,0],["shopping","Shop",IC.shop,shopLeft],["recipes","Recipes",IC.box,0]];
   document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
     `<button class="tab" data-action="go" data-v="${k}" ${S.view === k ? 'aria-current="page"' : ""}>${ic}<span>${l}</span>${b ? `<span class="badge">${b}</span>` : ""}</button>`).join("");
-  const d = new Date(); d.setDate(d.getDate() - d.getDay());
-  document.getElementById("wk").textContent = "Week of " + d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  if (S.loaded && S.archivedFor !== curKey()) archiveWeeks();
+  document.getElementById("weekbar").innerHTML = weekBar();
   document.getElementById("acct").innerHTML = gearBtn();
   if (!S.loaded) return;
   document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : S.view === "search" ? vSearch() : vGenerate());
   renderSheet();
+}
+function weekBar(){
+  if (!["plan","generate","search","shopping"].includes(S.view)) return "";
+  const past = S.wk < 0, k = viewKey();
+  const canBack = S.view === "plan" ? S.wk > -1 : S.wk > 0;
+  const dots = `<span class="wdots" aria-hidden="true">${[0, 1, 2].map(i => `<i class="${i === S.wk ? "on" : ""}"></i>`).join("")}</span>`;
+  return `<div class="weekbar" role="group" aria-label="Choose a week">
+    <button data-action="wk" data-d="-1" ${canBack ? "" : "disabled"} aria-label="${S.wk === 0 ? "Past weeks" : "Previous week"}">${IC.left}</button>
+    <div class="wl" aria-live="polite">${past ? `<b>Past weeks</b><span>Meals from finished weeks</span>` : `<b>${esc(weekName(k))}</b><span>${esc(weekRange(k))}</span>${dots}`}</div>
+    <button data-action="wk" data-d="1" ${S.wk < MAX_AHEAD ? "" : "disabled"} aria-label="Next week">${IC.right}</button></div>`;
 }
 function needsAttention(){ return !gemKey() || !!store.fbError || (!!store.fb && !store.user); }
 function gearBtn(){
@@ -1352,17 +1466,31 @@ function minsOf(r){ const t = r.totalMinutes ?? ((r.prepMinutes || 0) + (r.cookM
 const starsMini = n => n ? `<span class="stars-mini" aria-label="${n} of 5 stars">${IC.star.repeat(n)}</span>` : "";
 
 /* ---------- view: plan ---------- */
+function vPast(){
+  const keys = Object.keys(S.past).sort().reverse();
+  const head = `<div class="view-head"><div><h2>Past weeks</h2><p>Finished weeks move here on Sunday. Add a meal again with one tap.</p></div></div>`;
+  if (!keys.length) return head + `<div class="empty"><h3>No past weeks yet</h3><p>When a week ends, its meals show up here, made or not.</p></div>`;
+  return head + keys.map(k => { const ms = S.past[k], made = ms.filter(m => m.done).length;
+    return `<section class="panel pastwk"><h3>Week of ${esc(mdy(keyDate(k)))}<span>${made} of ${ms.length} made</span></h3>
+      ${ms.map(m => { const r = S.recipes[m.id];
+        return `<div class="pastrow"><span class="mk ${m.done ? "y" : ""}" aria-label="${m.done ? "Made" : "Not made"}">${IC.check}</span>
+        <span class="pn">${r ? `<button class="linkish" data-action="open" data-id="${r.id}" style="all:unset;cursor:pointer">${esc(m.name)}</button>` : esc(m.name)}<small>${m.done ? "Made" : "Not made"}${r && r.inPlan ? " · planned for " + esc(weekLower(weekOfR(r))) : ""}</small></span>
+        ${r && !r.inPlan ? `<button class="btn small" data-action="replan" data-id="${r.id}">${IC.plus}This week</button>` : ""}</div>`; }).join("")}</section>`; }).join("");
+}
 function vPlan(){
-  const all = planRecipes(), open = all.filter(r => !r.done), done = all.filter(r => r.done);
-  const pend = pendingRecipes().length, sh = S.plan.shopping, fresh = sh && sh.builtFor === shopIds();
+  if (S.wk < 0) return vPast();
+  const k = viewKey();
+  const all = planRecipes(k), open = all.filter(r => !r.done), done = all.filter(r => r.done);
+  const pend = all.filter(r => r.pending).length, sf = shopFor(k), sh = sf.list, fresh = shopFresh(sf);
   const shopBtn = !open.length ? "" : pend
     ? `<button class="btn small" disabled><span class="spin"></span>Writing ${pend} recipe${pend > 1 ? "s" : ""}…</button>`
     : fresh ? `<button class="btn small" data-action="go" data-v="shopping">${IC.shop}View shopping list</button>`
     : `<button class="btn small primary" data-action="buildshop">${IC.shop}${sh ? "Update shopping list" : "Build shopping list"}</button>`;
-  const head = `<div class="view-head"><div><h2>This week's meals</h2><p>${all.length ? `${open.length} to make · ${done.length} done · ${all.length} of ${S.settings.meals} planned` : "Nothing planned yet."}</p></div>
+  const title = weekDiff(k) === 0 ? "This week's meals" : weekDiff(k) === 1 ? "Next week's meals" : "Meals for the week of " + mdy(keyDate(k));
+  const head = `<div class="view-head"><div><h2>${esc(title)}</h2><p>${all.length ? `${open.length} to make · ${done.length} done · ${all.length} of ${S.settings.meals} planned` : "Nothing planned yet."}</p></div>
     <div class="row">${shopBtn}${done.length ? `<button class="btn small ${S.armed === "clear" ? "armed" : ""}" data-action="clear-done">${S.armed === "clear" ? "Tap again to clear" : "Clear finished meals"}</button>` : ""}
     <button class="btn small ${open.length ? "" : "primary"}" data-action="go" data-v="generate">${IC.plus}Add meals</button></div></div>`;
-  if (!all.length) return head + `<div class="empty"><h3>No meals planned</h3><p>Get suggestions, pick the ones you like, and they'll show up here with a shopping list.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
+  if (!all.length) return head + `<div class="empty"><h3>No meals planned for ${esc(weekLower(k))}</h3><p>Get suggestions, pick the ones you like, and they'll show up here with a shopping list.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
   return head + busyBox() + `<div class="tiles">${all.map(r => tile(r, { check: true })).join("")}</div>`;
 }
 /* check: show the "made it" circle (Meal Plan page only) */
@@ -1421,7 +1549,7 @@ function vGenerate(){
       ${pk ? `<div class="buildbar"><div><strong>${full ? "All picked." : `${pk} of ${need} picked`}</strong> <span class="muted">${pendingRecipes().length ? "Recipes are being written." : "Already on your Meal Plan."}</span></div>
         <button class="btn primary" data-action="go" data-v="plan">${IC.plan}View meal plan</button></div>` : ""}`;
   }
-  return `<div class="view-head"><div><h2>Suggest meals</h2><p>Pick the ones you want, pass on the rest, or save one for later.</p></div></div><div class="gen"><div class="settings">${controls}</div><section id="cands">${laterBox()}${right}</section></div>`;
+  return `<div class="view-head"><div><h2>Suggest meals <span class="weekpill">For ${esc(weekLower(viewKey()))}</span></h2><p>Pick the ones you want, pass on the rest, or save one for later.</p></div></div><div class="gen"><div class="settings">${controls}</div><section id="cands">${laterBox()}${right}</section></div>`;
 }
 function laterBox(){
   const l = laterList(); if (!l.length) return "";
@@ -1441,12 +1569,13 @@ function vSearch(){
   const ai = `<section class="sgroup"><h3>New ideas <span>for "${esc(ran)}"</span></h3>
     ${se.ai.length ? `<div class="cands">${se.ai.map(c => cand(c, { search: true })).join("")}</div>` : se.busy ? "" : `<p class="muted">No new ideas yet.</p>`}
     <div class="row" style="margin-top:14px">${se.busy ? `<div class="busy" role="status"><span class="spin"></span><div>Searching for ${esc(ran)}…<small>This usually takes a few seconds.</small></div></div>` : se.ai.length ? `<button class="btn" data-action="searchmore">${IC.plus}5 more like this</button>` : gemKey() ? `<button class="btn" data-action="searchmore">${IC.search}Try again</button>` : ""}</div></section>`;
-  return head + `<p class="hint" style="margin:0 0 16px">${weekCount()} of ${S.settings.meals} meals planned this week.</p>` + box + ai;
+  return head + `<p class="hint" style="margin:0 0 16px">${weekCount()} of ${S.settings.meals} meals planned for ${esc(weekLower(viewKey()))}. Picks go to that week.</p>` + box + ai;
 }
 function cand(c, { search = false } = {}){
   const box = c.favId && S.recipes[c.favId];
   if (search && c.fromBox && box) { if (box.inPlan && c.status !== "picked") { c.status = "picked"; c.recipeId = box.id; } else if (!box.inPlan && c.status === "picked") { c.status = "open"; delete c.recipeId; } }
   const isP = c.status === "picked", full = weekCount() >= S.settings.meals;
+  const pickedWk = isP && S.recipes[c.recipeId] ? weekOfR(S.recipes[c.recipeId]) : null;
   return `<article class="cand ${isP ? "picked" : ""}" data-cid="${c.id}">
     <span class="eyebrow" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">${catLabel(c.category)} · ${esc(cap(c.mealType))}${c.favId ? (box && !box.favorite ? `<span class="laterbadge">Your recipe</span>` : `<span class="favbadge">${IC.heart}Your favorite</span>`) : ""}${c.later ? `<span class="laterbadge">${IC.clock.replace("<svg", '<svg width="12" height="12"')}Saved for later</span>` : ""}</span>
     <h3>${esc(c.name)}</h3>
@@ -1458,7 +1587,7 @@ function cand(c, { search = false } = {}){
     <div class="acts">
       <button class="btn small" data-action="reject" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.x}Pass</button>
       <button class="btn small" data-action="later" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.clock}Later</button>
-      <button class="btn small ${isP ? "" : "primary"}" data-action="pick" data-id="${c.id}" ${!isP && full ? "disabled" : ""}>${isP ? "Picked · undo" : IC.check + "Pick"}</button>
+      <button class="btn small ${isP ? "" : "primary"}" data-action="pick" data-id="${c.id}" ${!isP && full ? "disabled" : ""}>${isP ? (pickedWk && pickedWk !== viewKey() ? `${esc(weekName(pickedWk))} · undo` : "Picked · undo") : IC.check + "Pick"}</button>
     </div></article>`;
 }
 /* Family voting shows once someone else has joined the household. */
@@ -1540,15 +1669,20 @@ function sSettings(){
 }
 
 /* ---------- view: shopping ---------- */
-function shopRows(){
-  const sh = S.plan.shopping;
-  const rows = sh ? sh.items.map((it, i) => ({ ...it, key: "m" + i })) : [];
-  return rows.concat(S.extras.map(x => ({ ...x, meals: [], pantry: false, key: "x" + x.id })));
+function shopRows(k = viewKey()){
+  const sf = shopFor(k), ws = listWeeks(sf), cur = curKey();
+  const rows = sf.list ? sf.list.items.map((it, i) => ({ ...it, key: "m" + i })) : [];
+  return rows.concat(S.extras.filter(x => ws.includes(x.week || cur)).map(x => ({ ...x, meals: [], pantry: false, key: "x" + x.id })));
 }
 function vShopping(){
-  const sh = S.plan.shopping, stale = sh && sh.builtFor !== shopIds(), pend = pendingRecipes().length;
-  const rows = shopRows();
-  const head = `<div class="view-head"><div><h2>Shopping list</h2><p>${sh ? `For ${openMeals().length} upcoming meal${openMeals().length === 1 ? "" : "s"} · ${S.settings.people} people` : "Built from the meals in your plan, plus anything you add."}</p></div>
+  const k = viewKey(), sf = shopFor(k), sh = sf.list, ws = listWeeks(sf), combined = ws.length > 1;
+  const nMeals = ws.reduce((t, w) => t + openMeals(w).length, 0);
+  const stale = sh && !shopFresh(sf), pend = ws.reduce((t, w) => t + planRecipes(w).filter(r => r.pending).length, 0);
+  const rows = shopRows(k);
+  const nextK = addWeeks(k, 1), canCombine = !combined && S.wk < MAX_AHEAD && openMeals(nextK).length > 0 && openMeals(k).length > 0;
+  const combo = combined ? `<div class="combo"><span><strong>One trip for 2 weeks:</strong> ${esc(weekName(ws[0]))} and ${esc(weekLower(ws[1]))}${sf.owner !== k ? ". This list was made from " + esc(weekLower(sf.owner)) + "." : "."}</span><button class="btn small" data-action="separate">Separate lists</button></div>`
+    : canCombine ? `<div class="combo"><span>Shopping once for both ${esc(weekLower(k))} and ${esc(weekLower(nextK))}?</span><button class="btn small" data-action="combine" ${pend ? "disabled" : ""}>Combine 2 weeks</button></div>` : "";
+  const head = `<div class="view-head"><div><h2>Shopping list</h2><p>${sh ? `${esc(combined ? "2 weeks" : weekName(k))} · ${nMeals} meal${nMeals === 1 ? "" : "s"} · ${S.settings.people} people` : `${esc(weekName(k))} · built from the meals you plan, plus anything you add.`}</p></div>
     ${rows.length ? `<div class="row"><button class="chip" data-action="hidepantry" aria-pressed="${S.hidePantry}">Hide pantry staples</button><button class="btn small" data-action="copy">${IC.copy}Copy list</button><button class="btn small quiet" data-action="settings" title="Change the order of store sections">Aisle order</button></div>` : ""}</div>`;
   const addBox = `<section class="panel addbox"><label class="lbl" for="addtxt">Add items</label>
     <textarea id="addtxt" rows="2" placeholder="Type items, or paste the shopping list text Alexa sends you"></textarea>
@@ -1556,12 +1690,13 @@ function vShopping(){
   if (S.busy && S.busy.kind === "shop") return head + busyBox();
   let top = "";
   if (!sh) {
-    top = openMeals().length
-      ? `<div class="notice"><span>${pend ? `Waiting for ${pend} recipe${pend > 1 ? "s" : ""} to finish writing.` : `Build a list from the ${openMeals().length} meals in your plan.`}</span><button class="btn small primary" data-action="buildshop" ${pend ? "disabled" : ""}>Build shopping list</button></div>`
-      : rows.length ? "" : `<div class="empty"><h3>Nothing to shop for yet</h3><p>Pick meals and build the list from the Meal Plan, or add your own items below.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
+    top = openMeals(k).length
+      ? `<div class="notice"><span>${pend ? `Waiting for ${pend} recipe${pend > 1 ? "s" : ""} to finish writing.` : `Build a list from the ${openMeals(k).length} meal${openMeals(k).length === 1 ? "" : "s"} planned for ${esc(weekLower(k))}.`}</span><button class="btn small primary" data-action="buildshop" ${pend ? "disabled" : ""}>Build shopping list</button></div>`
+      : rows.length ? "" : `<div class="empty"><h3>Nothing to shop for yet</h3><p>Pick meals for ${esc(weekLower(k))} and build the list from the Plan, or add your own items below.</p><button class="btn primary" data-action="go" data-v="generate">${IC.gen}Suggest meals</button></div>`;
   } else if (stale) {
-    top = `<div class="notice"><span>${pend ? "Some recipes are still being written." : "Your meal plan changed since this list was made."}</span><button class="btn small" data-action="buildshop" ${pend ? "disabled" : ""}>Update list</button></div>`;
+    top = `<div class="notice"><span>${pend ? "Some recipes are still being written." : "Your meals or recipes changed since this list was made."}</span><button class="btn small" data-action="buildshop" ${pend ? "disabled" : ""}>Update list</button></div>`;
   }
+  top = combo + top;
   // unchecked items stay in their aisle; checked ones drop to "In the cart" at the bottom
   const visible = rows.filter(it => !(S.hidePantry && it.pantry));
   const groups = aisleOrder().map(sec => [sec, visible.filter(it => it.section === sec && !it.got)]).filter(g => g[1].length);
@@ -1569,7 +1704,7 @@ function vShopping(){
   if (inCart.length) groups.push(["In the cart", inCart, true]);
   const left = sh ? sh.items.filter(i => i.leftover) : [];
   const useUp = sh && ((sh.useItUp && sh.useItUp.length) || left.length) ? `<section class="panel useup"><h3>${IC.leaf}Use it up</h3>
-    ${left.length ? `<p class="muted" style="margin:0 0 6px">${left.length} item${left.length > 1 ? "s" : ""} will have some left over after this week's meals.</p>` : ""}
+    ${left.length ? `<p class="muted" style="margin:0 0 6px">${left.length} item${left.length > 1 ? "s" : ""} will have some left over after these meals.</p>` : ""}
     ${sh.useItUp && sh.useItUp.length ? `<ul>${sh.useItUp.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</section>` : "";
   return head + top + addBox + useUp + `<div class="shop">${groups.map(([sec, items, cart]) => `<section class="panel aisle ${cart ? "cart" : ""}"><h3><b class="sec">${cart ? IC.check : ""}${esc(sec)}</b><span>${cart ? `${items.length} item${items.length > 1 ? "s" : ""}` : `${items.length} left`}</span></h3>
     ${items.map(it => `<div class="item ${it.got ? "got" : ""} ${it.added ? "isx" : ""}"><input type="checkbox" id="chk-${it.key}" data-action="got" data-k="${it.key}" ${it.got ? "checked" : ""}>
@@ -1609,25 +1744,99 @@ function boxList(list){
 function renderSheet(){
   const root = document.getElementById("sheetRoot");
   if (!S.sheet) { root.innerHTML = ""; document.body.style.overflow = ""; return; }
-  const body = S.sheet.type === "recipe" ? sRecipe() : S.sheet.type === "settings" ? sSettings() : sAdd();
+  const body = S.sheet.type === "recipe" ? sRecipe() : S.sheet.type === "settings" ? sSettings() : S.sheet.type === "edit" ? sEdit() : sAdd();
   if (!body) { S.sheet = null; root.innerHTML = ""; document.body.style.overflow = ""; return; }
   const keep = root.querySelector(".sheet"); const top = keep ? keep.scrollTop : 0;
   root.innerHTML = `<div class="scrim" data-action="scrim"><div class="sheet" role="dialog" aria-modal="true">${body}</div></div>`;
   root.querySelector(".sheet").scrollTop = top;
   document.body.style.overflow = "hidden";
 }
+const HOW = { original: "Original", edit: "Edited", gemini: "Changed by Gemini", restore: "Restored" };
+const fmtWhen = t => { const d = new Date(t || 0); return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: d.getFullYear() === new Date().getFullYear() ? undefined : "numeric" }) + ", " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); };
+const QUICK = [["Healthier","Make it lighter and healthier"],["Quicker","Make it faster: 30 minutes or less in total"],["Vegetarian","Make it vegetarian"],["Gluten-free","Make it gluten-free"],["Dairy-free","Make it dairy-free"],["Slow cooker","Turn it into a slow cooker recipe"],["Milder","Make it less spicy"],["Spicier","Make it spicier"],["Fewer dishes","Use fewer pots and pans"]];
+function editBlock(r){
+  if (r.pending || r.writeFailed || S.sheet.preview != null) return "";
+  const busy = S.busy && S.busy.kind === "change";
+  const just = S.sheet.just;
+  const sf = r.inPlan ? shopFor(weekOfR(r)) : null, shopStale = sf && sf.list && !shopFresh(sf);
+  return `${just ? `<div class="edited" role="status"><span><b>${esc(HOW[r.editHow] || "Updated")}.</b> ${esc(r.editNote || "")}</span><span class="row">${(r.versions || []).length ? `<button class="btn small" data-action="undoedit" data-id="${r.id}">Undo</button>` : ""}${shopStale ? `<button class="btn small primary" data-action="sheetshop" data-id="${r.id}">${IC.shop}Update shopping list</button>` : ""}</span></div>` : ""}
+    <div class="editrow"><button class="btn small" data-action="edit" data-id="${r.id}">${IC.edit}Edit</button>
+      <button class="btn small" data-action="ask" aria-expanded="${!!S.sheet.ask}">${IC.gen}Ask Gemini to change</button></div>
+    ${S.sheet.ask ? `<div class="askbox">${busy ? busyBox() : `
+      <label class="lbl" for="askreq">What should change?</label>
+      <div class="joinrow"><input type="text" id="askreq" placeholder="Swap chicken for shrimp, serve 6…" autocomplete="off" enterkeyhint="go"><button class="btn small primary" data-action="askgo" data-id="${r.id}">Change it</button></div>
+      <div class="quick">${QUICK.map(([l, t]) => `<button class="chip" data-action="quick" data-id="${r.id}" data-v="${esc(t)}">${esc(l)}</button>`).join("")}</div>
+      <span class="hint">The current version is saved, so you can always go back.</span>`}</div>` : ""}`;
+}
+function histBlock(r){
+  const vs = r.versions || []; if (!vs.length || r.pending) return "";
+  const rows = [`<div class="hrow cur"><span><span class="ht">${esc(HOW[r.editHow] || "Original")} · ${esc(fmtWhen(r.editedAt || r.createdAt))}</span><span class="hn">${esc([r.editBy, r.editNote].filter(Boolean).join(" · "))}</span></span>${S.sheet.preview != null ? `<span class="hb"><button class="btn small" data-action="hback">View</button></span>` : ""}</div>`]
+    .concat(vs.map((v, i) => [v, i]).reverse().map(([v, i]) => `<div class="hrow"><span><span class="ht">${esc(HOW[v.how] || "Earlier")} · ${esc(fmtWhen(v.at))}</span><span class="hn">${esc([v.by, v.note].filter(Boolean).join(" · ") || (v.data && v.data.name) || "")}</span></span>
+      <span class="hb"><button class="btn small" data-action="hview" data-i="${i}" aria-pressed="${S.sheet.preview === i}">View</button><button class="btn small" data-action="hrestore" data-i="${i}">Restore</button></span></div>`));
+  return `<details class="fold hist" id="fold-hist" ${S.open.hist || S.sheet.preview != null ? "open" : ""}><summary><span><span class="t">${IC.hist.replace("<svg", '<svg width="16" height="16" style="vertical-align:-3px;margin-right:6px"')}Version history</span><span class="s">${vs.length + 1} versions · every change is kept</span></span>${IC.chev}</summary><div class="inner" style="gap:0">${rows.join("")}</div></details>`;
+}
+/* ---------- recipe versions ---------- */
+const VF = ["name","description","category","mealType","cuisine","servings","prepMinutes","cookMinutes","ingredients","steps","tips"];
+const snap = r => clone(Object.fromEntries(VF.map(k => [k, r[k] ?? null])));
+function newVersion(r, how, note, changes){
+  r.versions = [...(r.versions || []), { at: r.editedAt || r.createdAt || Date.now(), how: r.editHow || "original", by: r.editBy || "", note: r.editNote || "", data: snap(r) }];
+  Object.assign(r, clone(changes)); r.editedAt = Date.now(); r.editHow = how; r.editNote = note; r.editBy = myName(); r.rev = (r.rev || 0) + 1;
+  saveRecipe(r);
+}
+function undoEdit(r){
+  const v = (r.versions || []).pop(); if (!v) return;
+  Object.assign(r, clone(v.data)); r.editedAt = v.at; r.editHow = v.how; r.editNote = v.note; r.editBy = v.by; r.rev = (r.rev || 0) + 1;
+  saveRecipe(r);
+}
+async function aiChange(r, req){
+  req = String(req || "").trim();
+  if (!req) { toast("Say what to change, or tap one of the quick buttons."); return; }
+  if (S.busy) return;
+  if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  const id = r.id;
+  S.busy = { kind: "change", label: "Gemini is changing the recipe", sub: "This usually takes 10 to 30 seconds." }; renderSheet();
+  try {
+    const cur = { name: r.name, servings: r.servings, prepMinutes: r.prepMinutes, cookMinutes: r.cookMinutes, ingredients: r.ingredients, steps: r.steps, tips: r.tips };
+    const o = await askJSON(`Here is a home recipe as JSON:
+${JSON.stringify(cur)}
+Change it like this: ${req}
+Household special requests (follow strictly; allergies are hard rules): ${prefsText().req}.
+Keep everything else the same unless the change needs it. Keep it serving ${r.servings} unless asked otherwise. Rename it only if the old name would be wrong. Use US measurements.
+Reply with only a JSON object shaped like:
+{"name":"...","servings":${r.servings},"prepMinutes":15,"cookMinutes":30,"ingredients":[{"item":"boneless chicken thighs","quantity":2,"unit":"lb","note":"trimmed"}],"steps":["..."],"tips":"...","changeNote":"One short sentence saying what changed."}
+quantity is a number or null for "to taste".`);
+    const r2 = S.recipes[id];
+    if (!r2) return;
+    if (!o || !Array.isArray(o.ingredients) || !o.ingredients.length) throw { code: "invalid_json" };
+    const n = normRecipe(o, r2);
+    newVersion(r2, "gemini", String(o.changeNote || req).slice(0, 200), { name: n.name, servings: n.servings, prepMinutes: n.prepMinutes, cookMinutes: n.cookMinutes, ingredients: n.ingredients, steps: n.steps, tips: n.tips });
+    if (S.sheet && S.sheet.id === id) { S.sheet.ask = false; S.sheet.just = true; }
+  } catch (e) { console.error(e); toast(aiErr(e)); }
+  finally { S.busy = null; render(); }
+}
+function sEdit(){
+  const r = S.recipes[S.sheet.id]; if (!r) return "";
+  return `<div class="sheet-head"><h2>Edit recipe</h2><button class="x" data-action="edit-cancel" aria-label="Close">${IC.x}</button></div>
+    <p class="muted" style="margin:0 0 16px">Your current version is saved in the history, so you can go back anytime.</p>
+    <div class="stack">${draftFields(S.sheet.draft)}
+      <div class="row" style="justify-content:flex-end"><button class="btn quiet" data-action="edit-cancel">Cancel</button><button class="btn primary" data-action="save-edit">Save changes</button></div></div>`;
+}
 function sRecipe(){
   const r = S.recipes[S.sheet.id]; if (!r) return "";
-  const times = [r.prepMinutes ? `Prep ${r.prepMinutes} min` : "", r.cookMinutes ? `Cook ${r.cookMinutes} min` : ""].filter(Boolean);
-  return `<div class="sheet-head"><div><span class="eyebrow" style="display:flex;gap:7px;align-items:center">${catLabel(r.category)} · ${esc(cap(r.mealType))}${r.source !== "ai" ? " · My recipe" : ""}</span><h2 style="margin-top:6px">${esc(r.name)}</h2></div>
+  const pv = S.sheet.preview != null ? (r.versions || [])[S.sheet.preview] : null;
+  if (S.sheet.preview != null && !pv) S.sheet.preview = null;
+  const shown = pv ? { ...snap(r), ...pv.data } : r;
+  const times = [shown.prepMinutes ? `Prep ${shown.prepMinutes} min` : "", shown.cookMinutes ? `Cook ${shown.cookMinutes} min` : ""].filter(Boolean);
+  return `<div class="sheet-head"><div><span class="eyebrow" style="display:flex;gap:7px;align-items:center">${catLabel(r.category)} · ${esc(cap(r.mealType))}${r.source !== "ai" ? " · My recipe" : ""}</span><h2 style="margin-top:6px">${esc(shown.name)}</h2></div>
       <button class="x" data-action="close" aria-label="Close">${IC.x}</button></div>
-    <div class="meta" style="font-size:.92rem;margin-bottom:14px"><span>Serves ${r.servings}</span>${times.map(t => `<span>${t}</span>`).join("")}${r.cuisine ? `<span>${esc(r.cuisine)}</span>` : ""}${r.cost ? `<span class="cost">${esc(r.cost)}</span>` : ""}</div>
+    <div class="meta" style="font-size:.92rem;margin-bottom:14px"><span>Serves ${shown.servings}</span>${times.map(t => `<span>${t}</span>`).join("")}${r.cuisine ? `<span>${esc(r.cuisine)}</span>` : ""}${r.cost ? `<span class="cost">${esc(r.cost)}</span>` : ""}</div>
     ${r.description ? `<p class="muted" style="margin:0 0 14px;max-width:65ch">${esc(r.description)}</p>` : ""}
     <div class="toggles">
       ${S.sheet.from === "plan" && r.inPlan && !r.pending ? `<button class="toggle" data-action="toggle-done" data-id="${r.id}" aria-pressed="${r.done}">${IC.check}${r.done ? "Made it" : "Mark as made"}</button>` : ""}
       <button class="toggle fav-t" data-action="fav" data-id="${r.id}" aria-pressed="${r.favorite}">${r.favorite ? IC.heart : IC.heartO}${r.favorite ? "Favorite" : "Save as favorite"}</button>
-      <button class="toggle" data-action="inplan" data-id="${r.id}" aria-pressed="${!!r.inPlan}">${IC.cal}${r.inPlan ? "In this week's plan" : "Add to this week"}</button>
+      <button class="toggle" data-action="inplan" data-id="${r.id}" aria-pressed="${!!r.inPlan}">${IC.cal}${r.inPlan ? "Planned for " + esc(weekLower(weekOfR(r))) : "Add to " + esc(weekLower(viewKey()))}</button>
     </div>
+    ${editBlock(r)}
     <div style="margin-top:16px"><span class="lbl">Your rating</span>
       <div class="stars" role="group" aria-label="Rate this recipe">${[1,2,3,4,5].map(n => `<button class="${n <= myRating(r) ? "on" : ""}" data-action="rate" data-id="${r.id}" data-v="${n}" aria-label="${n} star${n > 1 ? "s" : ""}" aria-pressed="${n === myRating(r)}">${IC.star}</button>`).join("")}</div>
       ${(() => { const others = allRatings(r).filter(([u]) => u !== myId()); return others.length ? `<span class="famrate">Family: ${others.map(([u, n]) => `${esc(personName(u))} ${"★".repeat(n)}`).join(" · ")}${allRatings(r).length > 1 ? ` · average ${avgRating(r)}` : ""}</span>` : ""; })()}
@@ -1636,10 +1845,12 @@ function sRecipe(){
     ${r.pending ? `<div class="busy" style="margin-top:16px"><span class="spin"></span><div>Writing the full recipe…<small>It appears here in a moment.</small></div></div>` : ""}
     ${r.writeFailed ? `<div class="notice" style="margin-top:16px"><span>The recipe couldn't be written.</span><button class="btn small primary" data-action="retrywrite" data-id="${r.id}">Try again</button></div>` : ""}
     <div class="recipe-cols" ${r.pending || r.writeFailed ? "hidden" : ""}>
-      <section><h3>Ingredients</h3><ul class="ing">${r.ingredients.map(i => `<li><b>${esc(ingAmount(i))}</b><span>${esc(i.item)}${i.note ? `<span class="muted">, ${esc(i.note)}</span>` : ""}</span></li>`).join("") || '<li class="muted">No ingredients listed.</li>'}</ul></section>
-      <section><h3>Directions</h3><ol class="steps">${r.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("") || '<li class="muted"><span>No steps listed.</span></li>'}</ol>
-      ${r.tips ? `<div class="tipbox"><strong>Tip:</strong> ${esc(r.tips)}</div>` : ""}</section>
+      ${pv ? `<div class="previewbar"><span>You're looking at the version from <strong>${esc(fmtWhen(pv.at))}</strong> (${esc(HOW[pv.how] || "Earlier")}).</span><span class="row"><button class="btn small" data-action="hback">Back to current</button><button class="btn small primary" data-action="hrestore" data-i="${S.sheet.preview}">Restore this version</button></span></div>` : ""}
+      <section><h3>Ingredients</h3><ul class="ing">${shown.ingredients.map(i => `<li><b>${esc(ingAmount(i))}</b><span>${esc(i.item)}${i.note ? `<span class="muted">, ${esc(i.note)}</span>` : ""}</span></li>`).join("") || '<li class="muted">No ingredients listed.</li>'}</ul></section>
+      <section><h3>Directions</h3><ol class="steps">${shown.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("") || '<li class="muted"><span>No steps listed.</span></li>'}</ol>
+      ${shown.tips ? `<div class="tipbox"><strong>Tip:</strong> ${esc(shown.tips)}</div>` : ""}</section>
     </div>
+    ${histBlock(r)}
     <div class="row" style="margin-top:22px;justify-content:flex-end"><button class="btn small danger ${S.armed === "del-" + r.id ? "armed" : ""}" data-action="delete" data-id="${r.id}">${S.armed === "del-" + r.id ? "Tap again to delete" : "Delete recipe"}</button></div>`;
 }
 function sAdd(){
@@ -1660,7 +1871,14 @@ function sAdd(){
           ${S.sheet.photos.length ? (S.busy && S.busy.kind === "photo" ? busyBox() : `<button class="btn small primary" data-action="readphoto">Read the recipe${S.sheet.photos.length > 1 ? ` (${S.sheet.photos.length} photos)` : ""}</button>`) : ""}
         </div>
         <span class="hint">${S.sheet.photos.length ? "Add the back of the card or more pages, then tap Read the recipe." : "Add one or more photos, like the front and back of a recipe card. Gemini reads them into the form below for you to check."}</span></div>
-      <div class="field"><label for="d-name">Recipe name</label><input type="text" id="d-name" data-bind="draft.name" value="${esc(d.name)}" placeholder="Grandma's chicken enchiladas"></div>
+      ${draftFields(d)}
+      <div class="toggles"><button class="toggle" data-action="draft-plan" aria-pressed="${!!d.addToPlan}">${IC.cal}Add to ${esc(weekLower(viewKey()))}</button>
+        <button class="toggle fav-t" data-action="draft-fav" aria-pressed="${!!d.favorite}">${d.favorite ? IC.heart : IC.heartO}Favorite</button></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn quiet" data-action="close">Cancel</button><button class="btn primary" data-action="save-new">Save recipe</button></div>
+    </div>`;
+}
+function draftFields(d){
+  return `      <div class="field"><label for="d-name">Recipe name</label><input type="text" id="d-name" data-bind="draft.name" value="${esc(d.name)}" placeholder="Grandma's chicken enchiladas"></div>
       <div class="grid2">
         <div class="field"><label for="d-cat">Category</label><select id="d-cat" data-bind="draft.category">${CATS.map(c => `<option ${c === d.category ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
         <div class="field"><label for="d-type">Meal type</label><select id="d-type" data-bind="draft.mealType">${TYPES.map(([k, l]) => `<option value="${k}" ${k === d.mealType ? "selected" : ""}>${l}</option>`).join("")}</select></div>
@@ -1670,11 +1888,7 @@ function sAdd(){
       </div>
       <div class="field"><label for="d-ing">Ingredients</label><textarea id="d-ing" data-bind="draft.ingredients" rows="6" placeholder="One per line&#10;2 lb chicken thighs&#10;1 can (10 oz) red enchilada sauce">${esc(d.ingredients)}</textarea></div>
       <div class="field"><label for="d-steps">Directions</label><textarea id="d-steps" data-bind="draft.steps" rows="6" placeholder="One step per line">${esc(d.steps)}</textarea></div>
-      <div class="field"><label for="d-tips">Notes</label><input type="text" id="d-tips" data-bind="draft.tips" value="${esc(d.tips)}" placeholder="Optional"></div>
-      <div class="toggles"><button class="toggle" data-action="draft-plan" aria-pressed="${!!d.addToPlan}">${IC.cal}Add to this week's plan</button>
-        <button class="toggle fav-t" data-action="draft-fav" aria-pressed="${!!d.favorite}">${d.favorite ? IC.heart : IC.heartO}Favorite</button></div>
-      <div class="row" style="justify-content:flex-end"><button class="btn quiet" data-action="close">Cancel</button><button class="btn primary" data-action="save-new">Save recipe</button></div>
-    </div>`;
+      <div class="field"><label for="d-tips">Notes</label><input type="text" id="d-tips" data-bind="draft.tips" value="${esc(d.tips)}" placeholder="Optional"></div>`;
 }
 const newDraft = () => ({ name: "", category: "Other", mealType: "dinner", servings: S.settings.people, prepMinutes: "", cookMinutes: "", ingredients: "", steps: "", tips: "", addToPlan: false, favorite: true });
 function parseIngLine(line){
@@ -1694,7 +1908,33 @@ document.addEventListener("click", async e => {
   if (!["clear-done","delete","signout","leave","clearideas"].includes(a)) S.armed = null;
   const s = S.settings;
   switch (a){
-    case "go": S.view = v; S.sheet = null; render(); window.scrollTo(0, 0); break;
+    case "go": S.view = v; S.sheet = null; if (v !== "plan" && S.wk < 0) S.wk = 0; render(); window.scrollTo(0, 0); break;
+    case "wk": S.wk = clamp(S.wk + Number(el.dataset.d), S.view === "plan" ? -1 : 0, MAX_AHEAD); render(); break;
+    case "combine": if (S.busy) break; await buildShopping(viewKey(), "combine"); render(); toast("One shopping list for both weeks."); break;
+    case "separate": { const sf = shopFor(); delete S.shopW[sf.owner]; persist("shopping"); render(); toast("Lists separated. Build each week's list when you're ready."); break; }
+    case "replan": { const r = S.recipes[id]; if (!r) break; r.inPlan = true; r.planWeek = curKey(); r.done = false; r.addedAt = Date.now(); saveRecipe(r); syncCandidates(); render(); toast(`${r.name} is back on this week's plan.`); break; }
+    case "edit": { const r = S.recipes[id]; if (!r) break;
+      const ing = r.ingredients.map(ingText).join("\n"), st = r.steps.join("\n");
+      S.sheet = { type: "edit", id, from: S.sheet && S.sheet.from, draft: { name: r.name, category: r.category, mealType: r.mealType, servings: r.servings, prepMinutes: r.prepMinutes ?? "", cookMinutes: r.cookMinutes ?? "", ingredients: ing, steps: st, tips: r.tips || "", ing0: ing, st0: st } };
+      renderSheet(); break; }
+    case "edit-cancel": S.sheet = { type: "recipe", id: S.sheet.id, from: S.sheet.from }; renderSheet(); break;
+    case "save-edit": { const r = S.recipes[S.sheet.id]; if (!r) break; const d = S.sheet.draft;
+      if (!String(d.name).trim()) { toast("Give the recipe a name first."); break; }
+      const ch = { name: String(d.name).trim(), category: d.category, mealType: d.mealType, servings: num(d.servings, r.servings) || r.servings, prepMinutes: num(d.prepMinutes), cookMinutes: num(d.cookMinutes), tips: String(d.tips || "").trim(),
+        ingredients: d.ingredients === d.ing0 ? r.ingredients : d.ingredients.split("\n").map(x => x.trim()).filter(Boolean).map(parseIngLine),
+        steps: d.steps === d.st0 ? r.steps : d.steps.split("\n").map(x => x.trim()).filter(Boolean) };
+      if (JSON.stringify(VF.map(k => ch[k] ?? r[k] ?? null)) === JSON.stringify(VF.map(k => r[k] ?? null))) { S.sheet = { type: "recipe", id: r.id, from: S.sheet.from }; renderSheet(); toast("No changes to save."); break; }
+      newVersion(r, "edit", "Edited by hand", ch);
+      S.sheet = { type: "recipe", id: r.id, from: S.sheet.from, just: true }; render(); break; }
+    case "ask": S.sheet.ask = !S.sheet.ask; renderSheet(); if (S.sheet.ask) document.getElementById("askreq")?.focus(); break;
+    case "askgo": { const r = S.recipes[id]; const t = document.getElementById("askreq"); if (r) aiChange(r, t ? t.value : ""); break; }
+    case "quick": { const r = S.recipes[id]; if (r) aiChange(r, v); break; }
+    case "undoedit": { const r = S.recipes[id]; if (!r) break; undoEdit(r); S.sheet.just = false; render(); toast("Change undone."); break; }
+    case "sheetshop": { const r = S.recipes[id]; if (!r || S.busy) break; await buildShopping(weekOfR(r)); S.sheet.just = false; render(); toast("Shopping list updated."); break; }
+    case "hview": S.sheet.preview = Number(el.dataset.i); renderSheet(); document.querySelector(".sheet .recipe-cols")?.scrollIntoView({ block: "start" }); break;
+    case "hback": S.sheet.preview = null; renderSheet(); break;
+    case "hrestore": { const r = S.recipes[S.sheet.id]; const i = Number(el.dataset.i); const vv = r && (r.versions || [])[i]; if (!vv) break;
+      newVersion(r, "restore", `Went back to the version from ${fmtWhen(vv.at)}`, vv.data); S.sheet.preview = null; S.sheet.just = true; render(); break; }
     case "step": {
       const f = el.dataset.f, d = Number(el.dataset.d);
       if (f === "meals") s.meals = clamp(s.meals + d, 1, 28);
@@ -1733,7 +1973,7 @@ document.addEventListener("click", async e => {
         if (!inList) S.plan.candidates = [...S.plan.candidates, c];
         pickCandidate(c);
         if (c.status !== "picked" && !inList) S.plan.candidates = S.plan.candidates.filter(x => x !== c);
-        else if (c.status === "picked" && S.view === "search") toast(`Added to this week (${weekCount()} of ${s.meals}).`);
+        else if (c.status === "picked" && S.view === "search") toast(`Added to ${weekLower(viewKey())} (${weekCount()} of ${s.meals}).`);
       }
       render(); break; }
     case "reject": {
@@ -1761,8 +2001,8 @@ document.addEventListener("click", async e => {
     case "toggle-done": { const r = S.recipes[id]; if (!r) break; r.done = !r.done; r.doneAt = r.done ? Date.now() : (r.doneAt || null); saveRecipe(r); render();
       if (r.done && !r.rating) toast("Marked as made. Open it to rate it."); break; }
     case "fav": { const r = S.recipes[id]; r.favorite = !r.favorite; saveRecipe(r); render(); break; }
-    case "inplan": { const r = S.recipes[id]; r.inPlan = !r.inPlan; if (r.inPlan) { r.done = false; r.addedAt = Date.now(); } saveRecipe(r); syncCandidates(); render();
-      const n = weekCount(); toast(r.inPlan ? `Added to this week (${n} of ${s.meals} planned).` + (n > s.meals ? " That's more than your plan size." : "") : "Removed from this week's plan."); break; }
+    case "inplan": { const r = S.recipes[id]; const was = weekOfR(r); r.inPlan = !r.inPlan; if (r.inPlan) { r.done = false; r.addedAt = Date.now(); r.planWeek = viewKey(); } saveRecipe(r); syncCandidates(); render();
+      const n = weekCount(); toast(r.inPlan ? `Added to ${weekLower(viewKey())} (${n} of ${s.meals} planned).` + (n > s.meals ? " That's more than your plan size." : "") : `Removed from ${weekLower(was)}.`); break; }
     case "rate": { const r = S.recipes[id]; const n = Number(v); const me = myId();
       const mine = { ...(S.ratings[me] || {}) };
       if (myRating(r) === n) delete mine[r.id]; else mine[r.id] = n;
@@ -1802,7 +2042,8 @@ document.addEventListener("click", async e => {
         servings: num(d.servings, s.people) || s.people, prepMinutes: num(d.prepMinutes), cookMinutes: num(d.cookMinutes),
         ingredients: d.ingredients.split("\n").map(x => x.trim()).filter(Boolean).map(parseIngLine),
         steps: d.steps.split("\n").map(x => x.trim()).filter(Boolean), tips: d.tips.trim(),
-        source: d.sourceUrl && S.sheet.linkRead ? "link" : S.sheet.photos.length ? "photo" : "personal", sourceUrl: d.sourceUrl && S.sheet.linkRead ? d.sourceUrl : "", rating: 0, favorite: !!d.favorite, done: false, inPlan: !!d.addToPlan, addedAt: Date.now(), createdAt: Date.now() };
+        source: d.sourceUrl && S.sheet.linkRead ? "link" : S.sheet.photos.length ? "photo" : "personal", sourceUrl: d.sourceUrl && S.sheet.linkRead ? d.sourceUrl : "", rating: 0, favorite: !!d.favorite, done: false, inPlan: !!d.addToPlan, planWeek: d.addToPlan ? viewKey() : undefined, addedAt: Date.now(), createdAt: Date.now() };
+      if (!r.planWeek) delete r.planWeek;
       saveRecipe(r); S.sheet.photos.forEach(p => URL.revokeObjectURL(p.url)); S.sheet = { type: "recipe", id: r.id, from: S.view }; render(); toast(r.favorite ? "Recipe saved to your favorites." : "Recipe saved to your box."); break; }
   }
 });
@@ -1810,7 +2051,7 @@ document.addEventListener("change", e => {
   const t = e.target;
   if (t.dataset.action === "got") {
     const k = t.dataset.k;
-    if (k[0] === "m") { const it = S.plan.shopping && S.plan.shopping.items[Number(k.slice(1))]; if (it) { it.got = t.checked; persist("shopping"); } }
+    if (k[0] === "m") { const l = shopFor().list; const it = l && l.items[Number(k.slice(1))]; if (it) { it.got = t.checked; persist("shopping"); } }
     else { const it = S.extras.find(x => "x" + x.id === k); if (it) { it.got = t.checked; persist("extras"); } }
     render(); return;
   }
@@ -1830,6 +2071,7 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.sheet) { S.sheet = null; renderSheet(); }
+  if (e.key === "Enter" && e.target.id === "askreq") { e.preventDefault(); document.querySelector('[data-action="askgo"]')?.click(); }
   if (e.key === "Enter" && e.target.id === "sq") { e.preventDefault(); document.querySelector('[data-action="search"]')?.click(); }
   if (e.key === "Enter" && e.target.id === "req") { e.preventDefault(); e.target.blur(); document.querySelector('[data-action="generate"]')?.click(); }
 });
@@ -1844,6 +2086,7 @@ document.addEventListener("toggle", e => {
   if (e.target.id === "fold-settings") S.open.settings = e.target.open;
   if (e.target.id === "fold-conn") S.open.conn = e.target.open;
   if (e.target.id === "fold-house") S.open.house = e.target.open;
+  if (e.target.id === "fold-hist") S.open.hist = e.target.open;
 }, true);
 
 /* ---------- drag to reorder store sections (mouse and touch) ---------- */
@@ -1886,8 +2129,8 @@ async function init(){
   finally {
     window.__mbLoaded = true;
     S.loaded = true;
-    S.view = openMeals().length ? "plan" : "generate";
-    syncCandidates(); migrateOnce(); resumeWrites();
+    archiveWeeks();
+    S.view = openMeals().length ? "plan" : "generate"; syncCandidates(); migrateOnce(); resumeWrites();
     try { render(); } catch (e) { console.error(e); showFatal(e); }
     if (store.fbError) toast(store.fbError);
     loadModels();
