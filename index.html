@@ -3,38 +3,44 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2D6A4C">
+<meta name="theme-color" content="#1F4FD1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mealboard">
+<meta name="apple-mobile-web-app-title" content="YeahBuddy">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<title>Mealboard</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D6A4C'/%3E%3Cpath d='M18 44V22l14 12 14-12v22' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>YeahBuddy Meals</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cdefs%3E%3ClinearGradient id='ybg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232DD4BF'/%3E%3Cstop offset='1' stop-color='%230E7C70'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='256' height='256' rx='58' fill='url(%23ybg)'/%3E%3Crect x='76' y='38' width='124' height='180' rx='18' fill='none' stroke='%23fff' stroke-width='9'/%3E%3Cg fill='%23fff'%3E%3Crect x='60' y='68' width='30' height='11' rx='5.5'/%3E%3Crect x='60' y='106' width='30' height='11' rx='5.5'/%3E%3Crect x='60' y='144' width='30' height='11' rx='5.5'/%3E%3Crect x='60' y='182' width='30' height='11' rx='5.5'/%3E%3Cpath transform='translate(104 73) scale(.55)' d='M4 6a2.5 2.5 0 0 1 5 0V36H12.3V6a2.5 2.5 0 0 1 5 0V36H22.7V6a2.5 2.5 0 0 1 5 0V36H31V6a2.5 2.5 0 0 1 5 0V40C36 52 28 58 23 62L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 62C12 58 4 52 4 40Z'/%3E%3Cpath transform='translate(128 73) scale(.55)' d='M20 2C30 2 37 14 37 30C37 44 29 55 23 58L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 58C11 55 3 44 3 30C3 14 10 2 20 2Z'/%3E%3Cpath transform='translate(152 73) scale(.55)' d='M25 3C14 10 9 40 9 84C9 95 13 100 17 102L13 186a7 7 0 0 0 14 0L29 102V8C29 4 27 2 25 3Z'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Layout: app shell. Header with brand + tabs (tabs dock to the bottom on phones), one working view below, recipes as a tile grid, details in a sheet. */
 :root{
-  --bg:#F1F3EE; --surface:#FFFFFF; --sunk:#E6EAE2; --ink:#18221C; --muted:#58645C; --line:#D5DBD1;
-  --accent:#2D6A4C; --accent-ink:#FFFFFF; --accent-soft:#DCEBE1;
-  --gold:#C98A12; --gold-soft:#F6E7C4; --danger:#B03A26; --danger-soft:#F6DED8;
-  --scrim:rgba(18,26,21,.42); --shadow:0 1px 2px rgba(20,30,24,.06),0 6px 18px rgba(20,30,24,.07);
+  --bg:#F3F6FC; --surface:#FFFFFF; --sunk:#E8EEF8; --ink:#13213F; --muted:#56607A; --line:#D6DEEE;
+  --accent:#1F4FD1; --accent-ink:#FFFFFF; --accent-soft:#E3EBFF;
+  --cta:#F7882F; --cta-ink:#13213F; --teal:#14B8A6; --teal-ink:#FFFFFF; --teal-soft:#E3F7F4; --teal-text:#0B6B62;
+  --hdr:#1F4FD1; --hdr-ink:#FFFFFF; --hdr-soft:rgba(255,255,255,.14); --hdr-muted:#C9D8FF; --hdr-accent:#FFB27A;
+  --gold:#C98A12; --gold-soft:#FFF1D6; --danger:#E0313E; --danger-soft:#FDE3E5;
+  --scrim:rgba(19,33,63,.45); --shadow:0 1px 2px rgba(19,33,63,.06),0 6px 18px rgba(19,33,63,.08);
   --cat-l:40%; --cat-s:48%;
   --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --r:12px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#111612; --surface:#1A211C; --sunk:#232C26; --ink:#E8EDE7; --muted:#9AA69D; --line:#2E3931;
-  --accent:#74C49A; --accent-ink:#0D1A12; --accent-soft:#1F3328;
-  --gold:#E8B54A; --gold-soft:#3A3020; --danger:#EC7A63; --danger-soft:#3D221D;
+  --bg:#0B1222; --surface:#141D33; --sunk:#1B2742; --ink:#E8EEFA; --muted:#9AA7C2; --line:#26324F;
+  --accent:#5B8CFF; --accent-ink:#0B1222; --accent-soft:#1E2F5C;
+  --cta:#FF9A4D; --cta-ink:#13213F; --teal:#2DD4BF; --teal-ink:#0B1222; --teal-soft:#0F2A2E; --teal-text:#5EEAD4;
+  --hdr:#15306F; --hdr-ink:#FFFFFF; --hdr-soft:rgba(255,255,255,.1); --hdr-muted:#AFC4FF; --hdr-accent:#FF9A4D;
+  --gold:#F5C04A; --gold-soft:#3A3020; --danger:#FF5A66; --danger-soft:#3A1E25;
   --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35); --cat-l:66%; --cat-s:45%; color-scheme:dark } }
 :root[data-theme="dark"]{
-  --bg:#111612; --surface:#1A211C; --sunk:#232C26; --ink:#E8EDE7; --muted:#9AA69D; --line:#2E3931;
-  --accent:#74C49A; --accent-ink:#0D1A12; --accent-soft:#1F3328;
-  --gold:#E8B54A; --gold-soft:#3A3020; --danger:#EC7A63; --danger-soft:#3D221D;
+  --bg:#0B1222; --surface:#141D33; --sunk:#1B2742; --ink:#E8EEFA; --muted:#9AA7C2; --line:#26324F;
+  --accent:#5B8CFF; --accent-ink:#0B1222; --accent-soft:#1E2F5C;
+  --cta:#FF9A4D; --cta-ink:#13213F; --teal:#2DD4BF; --teal-ink:#0B1222; --teal-soft:#0F2A2E; --teal-text:#5EEAD4;
+  --hdr:#15306F; --hdr-ink:#FFFFFF; --hdr-soft:rgba(255,255,255,.1); --hdr-muted:#AFC4FF; --hdr-accent:#FF9A4D;
+  --gold:#F5C04A; --gold-soft:#3A3020; --danger:#FF5A66; --danger-soft:#3A1E25;
   --scrim:rgba(0,0,0,.6); --shadow:0 1px 2px rgba(0,0,0,.35); --cat-l:66%; --cat-s:45%; color-scheme:dark }
 
 *{box-sizing:border-box}
@@ -218,10 +224,44 @@ details.settings[open]>summary{margin-bottom:16px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 <style>
+/* YeahBuddy look */
+.top{background:var(--hdr);color:var(--hdr-ink);margin-inline:calc(50% - 50vw);padding-inline:max(16px,calc(50vw - 534px));padding-block:calc(14px + env(safe-area-inset-top,0px)) 14px;margin-bottom:12px}
+.brand{align-items:center}
+.brand .logo{width:36px;height:36px;flex:none;border-radius:9px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.brand h1{color:var(--hdr-ink);font-size:1.45rem}
+.brand h1 span{color:var(--hdr-accent)}
+.brand .wk{color:var(--hdr-muted)}
+.top .gear{background:var(--hdr-soft);border-color:rgba(255,255,255,.3);color:var(--hdr-ink)}
+.top .gear:hover{color:#fff;background:rgba(255,255,255,.22)}
+.top .gdot{border-color:var(--hdr)}
+.top .gdot:not(.warn){background:var(--teal)}
+.tabs{grid-template-columns:repeat(5,1fr)}
+@media (min-width:860px){
+  .tabs{background:var(--hdr-soft)}
+  .top .tab{color:var(--hdr-ink);opacity:.85}
+  .top .tab[aria-current="page"]{background:#fff;color:#1F4FD1;opacity:1}
+}
+.btn.primary{background:var(--cta);color:var(--cta-ink);border-color:var(--cta)}
+.tile.done .tile-check{background:var(--teal);border-color:var(--teal);color:var(--teal-ink)}
+.tile.done{background:var(--teal-soft);border-color:transparent}
+.shares{color:var(--teal-text)}
+.useup{background:var(--teal-soft)}
+.useup h3 svg{color:var(--teal-text)}
+.cand .acts{grid-template-columns:1fr 1fr 1.3fr}
+.cand .acts.two{grid-template-columns:1fr 1.4fr}
+.laterbadge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);letter-spacing:.04em}
+.laterbox{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:var(--r);background:var(--accent-soft);margin-bottom:14px;font-size:.92rem}
+.searchbar{display:flex;gap:8px;margin-bottom:8px}
+.searchbar input{flex:1;min-width:0;min-height:48px}
+.searchbar .btn{min-height:48px}
+.sgroup{margin-bottom:22px}
+.sgroup>h3{font-size:1.1rem;margin-bottom:10px;display:flex;align-items:baseline;gap:8px}
+.sgroup>h3 span{font-family:var(--f-body);font-size:.85rem;font-weight:400;color:var(--muted)}
+.searchtips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 /* additions for the standalone build */
 html,body{margin:0}
 body{-webkit-text-size-adjust:100%}
-.app{padding-top:env(safe-area-inset-top,0px)}
+.app{padding-top:0}
 .top-right{display:flex;align-items:center;gap:10px}
 .brand .wk{white-space:nowrap}
 .acct{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.85rem;color:var(--muted);white-space:nowrap}
@@ -338,7 +378,7 @@ window.addEventListener("error", function (e) {
 <body>
 <div class="app" id="app">
   <header class="top">
-    <div class="brand"><h1>Mealboard</h1><span class="wk" id="wk"></span></div>
+    <div class="brand"><svg class="logo" viewBox="0 0 256 256" aria-hidden="true"><defs><linearGradient id="ybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2DD4BF"/><stop offset="1" stop-color="#0E7C70"/></linearGradient></defs><rect width="256" height="256" rx="58" fill="url(#ybg)"/><rect x="76" y="38" width="124" height="180" rx="18" fill="none" stroke="#fff" stroke-width="9"/><g fill="#fff"><rect x="60" y="68" width="30" height="11" rx="5.5"/><rect x="60" y="106" width="30" height="11" rx="5.5"/><rect x="60" y="144" width="30" height="11" rx="5.5"/><rect x="60" y="182" width="30" height="11" rx="5.5"/><path transform="translate(104 73) scale(.55)" d="M4 6a2.5 2.5 0 0 1 5 0V36H12.3V6a2.5 2.5 0 0 1 5 0V36H22.7V6a2.5 2.5 0 0 1 5 0V36H31V6a2.5 2.5 0 0 1 5 0V40C36 52 28 58 23 62L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 62C12 58 4 52 4 40Z"/><path transform="translate(128 73) scale(.55)" d="M20 2C30 2 37 14 37 30C37 44 29 55 23 58L22.5 82C25 110 27 160 27 186a7 7 0 0 1-14 0C13 160 15 110 17.5 82L17 58C11 55 3 44 3 30C3 14 10 2 20 2Z"/><path transform="translate(152 73) scale(.55)" d="M25 3C14 10 9 40 9 84C9 95 13 100 17 102L13 186a7 7 0 0 0 14 0L29 102V8C29 4 27 2 25 3Z"/></g></svg><h1>YeahBuddy <span>Meals</span></h1><span class="wk" id="wk"></span></div>
     <div class="top-right"><nav class="tabs" id="tabs" aria-label="Sections"></nav><span id="acct"></span></div>
   </header>
   <main id="view"><div class="loading"><span class="spin"></span>Loading your meals…</div></main>
@@ -411,6 +451,8 @@ const IC = {
   grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
   down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
 };
 
@@ -445,12 +487,19 @@ const S = {
   ratings: {},    // { personId: { recipeId: 1..5 } }
   view: null, sheet: null, busy: null, loaded: false, armed: null,
   open: { settings: false, conn: false, house: false },
-  filter: { tab: "all", cat: "", q: "" }, hidePantry: false
+  filter: { tab: "all", cat: "", q: "" }, hidePantry: false,
+  search: { q: "", ran: "", box: [], ai: [], busy: false }
 };
 const recipesArr = () => Object.values(S.recipes);
 const planRecipes = () => recipesArr().filter(r => r.inPlan).sort((a, b) => (a.done - b.done) || (a.addedAt || 0) - (b.addedAt || 0));
 const openMeals = () => planRecipes().filter(r => !r.done);
 const picked = () => S.plan.candidates.filter(c => c.status === "picked");
+const laterList = () => Array.isArray(S.plan.later) ? S.plan.later : [];
+/* Sunday 00:00 of this week, local time. */
+function weekStart(){ const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); return d.getTime(); }
+const TWO_WEEKS = 14 * 864e5;
+/* Meals made or planned in the last 2 weeks: new ideas should not repeat them. */
+const recentMeals = () => recipesArr().filter(r => (r.doneAt && Date.now() - r.doneAt < TWO_WEEKS) || (r.inPlan && r.addedAt && Date.now() - r.addedAt < TWO_WEEKS)).map(r => r.name);
 /* Everything in this week's plan counts as picked, including meals added from the Recipes page. */
 const weekCount = () => planRecipes().length;
 const pendingRecipes = () => planRecipes().filter(r => r.pending);
@@ -785,11 +834,11 @@ function prefsText(){
 }
 const typesText = () => S.settings.mealTypes.join(", ");
 
-function normCand(m){
+function normCand(m, { anyType = false } = {}){
   const s = S.settings;
   return {
     id: uid(), status: "open", name: String(m.name).slice(0, 120), description: String(m.description || "").slice(0, 300),
-    mealType: TYPES.some(t => t[0] === m.mealType) && s.mealTypes.includes(m.mealType) ? m.mealType : s.mealTypes[0],
+    mealType: TYPES.some(t => t[0] === m.mealType) && (anyType || s.mealTypes.includes(m.mealType)) ? m.mealType : s.mealTypes[0],
     category: CATS.includes(m.category) ? m.category : "Other", cuisine: String(m.cuisine || ""),
     totalMinutes: num(m.totalMinutes), cost: /^\${1,3}$/.test(m.cost) ? m.cost : "",
     keyIngredients: Array.isArray(m.keyIngredients) ? m.keyIngredients.slice(0, 6).map(String) : [],
@@ -810,7 +859,7 @@ function favoriteCandidates(k){
   if (k <= 0) return [];
   const s = S.settings, listed = new Set(S.plan.candidates.map(c => c.favId).filter(Boolean));
   const rej = new Set(S.plan.rejected.map(x => x.toLowerCase()));
-  const pool = recipesArr().filter(r => r.favorite && !r.inPlan && !r.pending && !listed.has(r.id) && s.mealTypes.includes(r.mealType) && !rej.has(r.name.toLowerCase()) && r.ingredients && r.ingredients.length)
+  const pool = recipesArr().filter(r => r.favorite && !r.inPlan && !r.pending && !listed.has(r.id) && !(r.doneAt && Date.now() - r.doneAt < TWO_WEEKS) && s.mealTypes.includes(r.mealType) && !rej.has(r.name.toLowerCase()) && r.ingredients && r.ingredients.length)
     .map(r => [r, (r.doneAt || r.addedAt || r.createdAt || 0) + Math.random() * 864e5])
     .sort((a, b) => a[1] - b[1]).slice(0, k).map(x => x[0]);
   return pool.map(r => ({
@@ -821,19 +870,21 @@ function favoriteCandidates(k){
   }));
 }
 const BATCH_LEAN = ["chicken, turkey, vegetarian and seafood mains", "beef, pork, pasta, soups and grain bowls"];
-async function fetchIdeas(n, exclude, { batch = 0, of = 1 } = {}){
+async function fetchIdeas(n, exclude, { batch = 0, of = 1, query = "" } = {}){
   const s = S.settings, p = prefsText();
   const favs = recipesArr().filter(r => r.favorite).map(r => r.name).slice(0, 15);
-  const week = weekContext(), lw = lowWaste();
+  const week = query ? [] : weekContext(), lw = lowWaste() && !query;
+  const recent = recentMeals().slice(0, 30);
   const prompt =
 `You are planning home-cooked meals for a household of ${s.people} people.
-Suggest exactly ${n} different meal ideas. Meal types to cover: ${typesText()}${s.mealTypes.length > 1 ? " (spread them roughly evenly)" : ""}.
+${query ? `The household searched for: "${query}". Suggest exactly ${n} different meal ideas that clearly match this search. Be strict: if they named an ingredient, it must be a main ingredient of every idea; if they named a cuisine, dish or style, every idea must be that. Do not pad the list with loose matches. Any meal type that fits the search is fine.`
+ : `Suggest exactly ${n} different meal ideas. Meal types to cover: ${typesText()}${s.mealTypes.length > 1 ? " (spread them roughly evenly)" : ""}.`}
 Household preferences: ${p.opts}.
 Special requests (follow strictly; treat any allergy as a hard rule and avoid cross-contact ingredients): ${p.req}.
-${favs.length ? "Meals this household rated highly (taste reference only, do not repeat them): " + favs.join("; ") + ".\n" : ""}${exclude.length ? "Do not suggest any of these or close variations: " + exclude.join("; ") + ".\n" : ""}${week.length ? "Meals already chosen or on the list for this week: " + week.join("; ") + ".\n" : ""}${lw ? "Food waste matters to this household: favor ideas that reuse perishable ingredients from the meals above and from each other (the same fresh herbs, vegetables, dairy or protein), so nothing is bought for a single use and left to spoil.\n" : ""}${of > 1 ? `This is batch ${batch} of ${of} requested at the same time. To avoid overlap with the other batch, lean toward ${BATCH_LEAN[(batch - 1) % 2]}, unless the special requests say otherwise.\n` : ""}Vary proteins, cuisines and cooking methods.
+${favs.length ? "Meals this household rated highly (taste reference only, do not repeat them): " + favs.join("; ") + ".\n" : ""}${exclude.length ? "Do not suggest any of these or close variations: " + exclude.join("; ") + ".\n" : ""}${week.length ? "Meals already chosen or on the list for this week: " + week.join("; ") + ".\n" : ""}${lw ? "Food waste matters to this household: favor ideas that reuse perishable ingredients from the meals above and from each other (the same fresh herbs, vegetables, dairy or protein), so nothing is bought for a single use and left to spoil.\n" : ""}${of > 1 ? `This is batch ${batch} of ${of} requested at the same time. To avoid overlap with the other batch, lean toward ${BATCH_LEAN[(batch - 1) % 2]}, unless the special requests say otherwise.\n` : ""}${recent.length ? "Eaten or planned in the last 2 weeks (do not suggest these or close variations): " + recent.join("; ") + ".\n" : ""}${query ? "Within the search, vary the cooking methods and flavors." : `Vary proteins, cuisines and cooking methods. Make the list feel international: unless the special requests say otherwise, about half the ideas should come from cuisines such as Indian, Mexican, Thai, Chinese, Japanese, Korean, Vietnamese, Mediterranean, Middle Eastern or Latin American, kept weeknight-friendly with ingredients from a regular US grocery store. Use any one cuisine at most twice in the list.`}
 Reply with only a JSON array of ${n} objects shaped like:
 {"name":"Sheet-Pan Lemon Herb Chicken","description":"One appetizing sentence.","mealType":"dinner","category":"Chicken","cuisine":"Mediterranean","totalMinutes":40,"cost":"$","keyIngredients":["chicken thighs","baby potatoes","lemon"]${lw ? ',"sharesWith":["lemon","parsley"]' : ""}}${lw ? "\nsharesWith lists the perishable ingredients this idea shares with the meals above or with other ideas in your list (empty if none)." : ""}
-mealType is one of: ${typesText()}. category is one of: ${CATS.join(", ")}. cost is "$" (cheap), "$$" or "$$$".`;
+mealType is one of: ${query ? TYPES.map(t => t[0]).join(", ") : typesText()}. category is one of: ${CATS.join(", ")}. cost is "$" (cheap), "$$" or "$$$".`;
   let arr = await askJSON(prompt, { fast: true });
   if (!Array.isArray(arr)) arr = arr && (arr.meals || arr.ideas || arr.suggestions) || [];
   return Array.isArray(arr) ? arr.filter(m => m && m.name) : [];
@@ -844,12 +895,17 @@ async function suggest(n, { fresh = false, withFavorites = false } = {}){
   if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
   S.busy = { kind: "suggest", label: `Finding ${n} meal ideas`, sub: "This usually takes a few seconds." }; render();
   try {
-    if (fresh) { S.plan.rejected = [...S.plan.rejected, ...S.plan.candidates.filter(c => c.status !== "picked" && !c.favId && !c.pickedAt).map(c => c.name)].slice(-200); S.plan.candidates = picked(); }
+    if (fresh) { S.plan.rejected = [...S.plan.rejected, ...S.plan.candidates.filter(c => c.status !== "picked" && !c.favId && !c.pickedAt && !c.later).map(c => c.name)].slice(-200); S.plan.candidates = picked(); }
+    const due = withFavorites ? laterList().filter(x => (x.laterAt || 0) < weekStart()).slice(0, Math.max(0, n - 1)) : [];
+    if (due.length) { const ids = new Set(due.map(x => x.id)); S.plan.later = laterList().filter(x => !ids.has(x.id)); }
+    const back = due.map(x => ({ ...x, id: uid(), status: "open", later: true }));
+    S.plan.candidates = [...S.plan.candidates, ...back];
+    n -= back.length;
     const favs = withFavorites ? favoriteCandidates(Math.min(S.settings.favorites ?? 1, n - 1)) : [];
     S.plan.candidates = [...S.plan.candidates, ...favs];
     n -= favs.length;
     const keep = S.plan.candidates;
-    const exclude = () => [...new Set([...S.plan.candidates.map(c => c.name), ...S.plan.rejected, ...planRecipes().map(r => r.name)])].slice(-150);
+    const exclude = () => [...new Set([...S.plan.candidates.map(c => c.name), ...S.plan.rejected, ...planRecipes().map(r => r.name), ...laterList().map(x => x.name)])].slice(-150);
     const seen = new Set(exclude().map(x => x.toLowerCase()));
     const added = [];
     for (let attempt = 0; attempt < 2 && added.length < n; attempt++) {
@@ -999,6 +1055,48 @@ function migrateOnce(){
   if (S.settings.favMigrated) return;
   recipesArr().filter(r => r.source !== "ai" && !r.favorite).forEach(r => { r.favorite = true; saveRecipe(r); });
   S.settings.favMigrated = true; persist("settings");
+}
+/* ---------- search ---------- */
+const words = q => q.toLowerCase().split(/[^a-z0-9']+/).filter(w => w.length > 1 && !["and","with","the","for","some","any","meal","meals","recipe","recipes","dinner","dinners","ideas","idea"].includes(w));
+/* Strict match in the recipe box: every search word must appear (simple plural handling). */
+function boxMatches(q){
+  const ws = words(q); if (!ws.length) return [];
+  return recipesArr().filter(r => r.ingredients && r.ingredients.length).filter(r => {
+    const hay = (r.name + " " + (r.cuisine || "") + " " + r.category + " " + r.mealType + " " + (r.description || "") + " " + r.ingredients.map(i => i.item).join(" ")).toLowerCase();
+    return ws.every(w => hay.includes(w) || (w.endsWith("s") && hay.includes(w.slice(0, -1))) || (w.endsWith("es") && hay.includes(w.slice(0, -2))));
+  }).sort((a, b) => (b.favorite - a.favorite) || ((b.rating || 0) - (a.rating || 0))).slice(0, 8);
+}
+const boxCand = r => ({ id: uid(), status: r.inPlan ? "picked" : "open", recipeId: r.inPlan ? r.id : undefined, favId: r.id, fromBox: true, name: r.name, description: r.description || (r.favorite ? "One of your favorites." : "From your recipe box."),
+  mealType: r.mealType, category: r.category, cuisine: r.cuisine || "", cost: r.cost || "",
+  totalMinutes: num(r.totalMinutes) ?? (((r.prepMinutes || 0) + (r.cookMinutes || 0)) || null), keyIngredients: r.ingredients.slice(0, 5).map(i => i.item), sharesWith: [] });
+async function runSearch(more = false){
+  const q = (S.search.q || "").trim();
+  if (!q) { toast("Type what you're in the mood for."); return; }
+  if (S.search.busy) return;
+  if (!more) { S.search.ran = q; S.search.box = boxMatches(q).map(boxCand); S.search.ai = []; }
+  if (!gemKey()) { render(); if (!S.search.box.length) { openSettings(); toast(aiErr({ code: "no_key" })); } else toast("Add a Gemini key in Settings to search for new ideas too."); return; }
+  S.search.busy = true; render();
+  try {
+    const ex = [...new Set([...S.search.ai.map(c => c.name), ...S.search.box.map(c => c.name), ...S.plan.rejected.slice(-60), ...planRecipes().map(r => r.name), ...laterList().map(x => x.name)])];
+    const seen = new Set([...ex, ...recipesArr().map(r => r.name)].map(x => x.toLowerCase()));
+    const got = await fetchIdeas(6, ex, { query: S.search.ran });
+    if (S.search.ran !== q && !more) return;
+    const add = [];
+    for (const m of got) { const k = String(m.name).toLowerCase().trim(); if (seen.has(k) || add.length >= 5) continue; seen.add(k); add.push(normCand(m, { anyType: true })); }
+    S.search.ai = [...S.search.ai, ...add];
+    if (!add.length) toast("No new ideas came back for that search.");
+  } catch (e) { console.error(e); toast(aiErr(e)); }
+  S.search.busy = false; render();
+}
+const findCard = id => S.plan.candidates.find(x => x.id === id) || S.search.box.find(x => x.id === id) || S.search.ai.find(x => x.id === id);
+function saveForLater(c){
+  const keep = { ...c }; delete keep.status; delete keep.recipeId; delete keep.pickedAt; delete keep.later; delete keep.drop;
+  keep.laterAt = Date.now();
+  S.plan.later = [...laterList().filter(x => x.name.toLowerCase() !== c.name.toLowerCase()), keep].slice(-40);
+  S.plan.candidates = S.plan.candidates.filter(x => x.id !== c.id);
+  S.search.ai = S.search.ai.filter(x => x.id !== c.id); S.search.box = S.search.box.filter(x => x.id !== c.id);
+  persist("plan");
+  toast(`Saved for later. It comes back in next week's ideas.`);
 }
 async function buildPlan(){
   if (S.busy) return;
@@ -1211,14 +1309,14 @@ function toast(msg){ const t = document.getElementById("toast"); t.textContent =
 function render(){
   const n = openMeals().length;
   const shopLeft = shopRows().filter(i => !i.got && !i.pantry).length;
-  const tabs = [["plan","Meal plan",IC.plan,n],["generate","Suggest",IC.gen,0],["shopping","Shopping",IC.shop,shopLeft],["recipes","Recipes",IC.box,0]];
+  const tabs = [["plan","Plan",IC.plan,n],["generate","Suggest",IC.gen,0],["search","Search",IC.search,0],["shopping","Shop",IC.shop,shopLeft],["recipes","Recipes",IC.box,0]];
   document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
     `<button class="tab" data-action="go" data-v="${k}" ${S.view === k ? 'aria-current="page"' : ""}>${ic}<span>${l}</span>${b ? `<span class="badge">${b}</span>` : ""}</button>`).join("");
   const d = new Date(); d.setDate(d.getDate() - d.getDay());
   document.getElementById("wk").textContent = "Week of " + d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
   document.getElementById("acct").innerHTML = gearBtn();
   if (!S.loaded) return;
-  document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : vGenerate());
+  document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : S.view === "search" ? vSearch() : vGenerate());
   renderSheet();
 }
 function needsAttention(){ return !gemKey() || !!store.fbError || (!!store.fb && !store.user); }
@@ -1230,13 +1328,13 @@ function openSettings(){ S.sheet = { type: "settings" }; renderSheet(); }
 let installPrompt = null;
 const isInstalled = () => { try { return matchMedia("(display-mode: standalone)").matches || navigator.standalone === true; } catch { return false; } };
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; if (S.sheet && S.sheet.type === "settings") renderSheet(); });
-window.addEventListener("appinstalled", () => { installPrompt = null; toast("Mealboard is installed. Open it from your home screen."); if (S.sheet && S.sheet.type === "settings") renderSheet(); });
+window.addEventListener("appinstalled", () => { installPrompt = null; toast("YeahBuddy Meals is installed. Open it from your home screen."); if (S.sheet && S.sheet.type === "settings") renderSheet(); });
 if ("serviceWorker" in navigator && window.isSecureContext) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn("Service worker not registered", e)));
 function installBox(){
-  if (isInstalled()) return `<section class="setsec"><h3>App</h3><p class="hint">Mealboard is installed on this device.</p></section>`;
+  if (isInstalled()) return `<section class="setsec"><h3>App</h3><p class="hint">YeahBuddy Meals is installed on this device.</p></section>`;
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
   return `<section class="setsec"><h3>Install as an app</h3>
-    ${installPrompt ? `<div class="row"><button class="btn small primary" data-action="install">${IC.plus}Install Mealboard</button><span class="hint">Adds an icon to your home screen and opens full screen.</span></div>`
+    ${installPrompt ? `<div class="row"><button class="btn small primary" data-action="install">${IC.plus}Install YeahBuddy Meals</button><span class="hint">Adds an icon to your home screen and opens full screen.</span></div>`
       : ios ? `<p class="hint">On iPhone or iPad: tap the Share button in Safari, then <strong>Add to Home Screen</strong>.</p>`
       : `<p class="hint">In Chrome, open the ⋮ menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>. If you don't see it yet, reload the page once.</p>`}
   </section>`;
@@ -1319,16 +1417,38 @@ function vGenerate(){
       ${fromBox ? `<p class="fullnote">Includes ${fromBox} meal${fromBox > 1 ? "s" : ""} already in your plan.</p>` : ""}
       ${full ? `<p class="fullnote">You've picked all ${need}. Tap "Picked · undo" on one to swap it.</p>` : ""}
       <div class="cands">${c.map(cand).join("")}</div>
-      <div class="row" style="margin-top:14px">${busyBox() || `<button class="btn" data-action="more">${IC.plus}Suggest 5 more</button>`}</div>
+      <div class="row" style="margin-top:14px">${busyBox() || `<button class="btn" data-action="more">${IC.plus}Suggest 5 more</button>${c.some(x => x.status !== "picked") ? `<button class="btn ${S.armed === "clearideas" ? "armed" : ""}" data-action="clearideas">${IC.x}${S.armed === "clearideas" ? "Tap again to clear" : "Clear ideas"}</button>` : ""}`}</div>
       ${pk ? `<div class="buildbar"><div><strong>${full ? "All picked." : `${pk} of ${need} picked`}</strong> <span class="muted">${pendingRecipes().length ? "Recipes are being written." : "Already on your Meal Plan."}</span></div>
         <button class="btn primary" data-action="go" data-v="plan">${IC.plan}View meal plan</button></div>` : ""}`;
   }
-  return `<div class="view-head"><div><h2>Suggest meals</h2><p>Pick the ones you want, pass on the rest.</p></div></div><div class="gen"><div class="settings">${controls}</div><section id="cands">${right}</section></div>`;
+  return `<div class="view-head"><div><h2>Suggest meals</h2><p>Pick the ones you want, pass on the rest, or save one for later.</p></div></div><div class="gen"><div class="settings">${controls}</div><section id="cands">${laterBox()}${right}</section></div>`;
 }
-function cand(c){
+function laterBox(){
+  const l = laterList(); if (!l.length) return "";
+  const due = l.filter(x => (x.laterAt || 0) < weekStart()).length;
+  return `<div class="laterbox"><span>${IC.clock.replace("<svg", '<svg width="18" height="18" style="vertical-align:-4px;margin-right:6px"')}<strong>${l.length} saved for later:</strong> ${esc(l.slice(0, 3).map(x => x.name).join(", "))}${l.length > 3 ? "…" : ""}${due ? "" : " · back in next week's ideas"}</span>
+    <button class="btn small" data-action="laternow">Add them now</button></div>`;
+}
+/* ---------- view: search ---------- */
+function vSearch(){
+  const se = S.search, ran = se.ran;
+  const head = `<div class="view-head"><div><h2>Search</h2><p>Look for something specific in your recipes and new ideas from Gemini.</p></div></div>
+    <div class="searchbar"><input type="search" id="sq" data-bind="search.q" value="${esc(se.q)}" placeholder="Salmon, enchiladas, Thai curry…" autocomplete="off" enterkeyhint="search" aria-label="Search meals">
+      <button class="btn primary" data-action="search" ${se.busy ? "disabled" : ""}>${IC.search}Search</button></div>`;
+  if (!ran) return head + `<div class="empty" style="margin-top:14px"><h3>What are you in the mood for?</h3><p>Search an ingredient, dish or cuisine. Matches from your recipes show first, then new ideas.</p>
+    <div class="searchtips" style="justify-content:center">${["Salmon","Chicken thighs","Indian","Tacos","Soup"].map(t => `<button class="chip" data-action="searchtip" data-v="${t}">${t}</button>`).join("")}</div></div>`;
+  const box = se.box.length ? `<section class="sgroup"><h3>From your recipes <span>${se.box.length} match${se.box.length === 1 ? "" : "es"}</span></h3><div class="cands">${se.box.map(c => cand(c, { search: true })).join("")}</div></section>` : "";
+  const ai = `<section class="sgroup"><h3>New ideas <span>for "${esc(ran)}"</span></h3>
+    ${se.ai.length ? `<div class="cands">${se.ai.map(c => cand(c, { search: true })).join("")}</div>` : se.busy ? "" : `<p class="muted">No new ideas yet.</p>`}
+    <div class="row" style="margin-top:14px">${se.busy ? `<div class="busy" role="status"><span class="spin"></span><div>Searching for ${esc(ran)}…<small>This usually takes a few seconds.</small></div></div>` : se.ai.length ? `<button class="btn" data-action="searchmore">${IC.plus}5 more like this</button>` : gemKey() ? `<button class="btn" data-action="searchmore">${IC.search}Try again</button>` : ""}</div></section>`;
+  return head + `<p class="hint" style="margin:0 0 16px">${weekCount()} of ${S.settings.meals} meals planned this week.</p>` + box + ai;
+}
+function cand(c, { search = false } = {}){
+  const box = c.favId && S.recipes[c.favId];
+  if (search && c.fromBox && box) { if (box.inPlan && c.status !== "picked") { c.status = "picked"; c.recipeId = box.id; } else if (!box.inPlan && c.status === "picked") { c.status = "open"; delete c.recipeId; } }
   const isP = c.status === "picked", full = weekCount() >= S.settings.meals;
   return `<article class="cand ${isP ? "picked" : ""}" data-cid="${c.id}">
-    <span class="eyebrow" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">${catLabel(c.category)} · ${esc(cap(c.mealType))}${c.favId ? `<span class="favbadge">${IC.heart}Your favorite</span>` : ""}</span>
+    <span class="eyebrow" style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">${catLabel(c.category)} · ${esc(cap(c.mealType))}${c.favId ? (box && !box.favorite ? `<span class="laterbadge">Your recipe</span>` : `<span class="favbadge">${IC.heart}Your favorite</span>`) : ""}${c.later ? `<span class="laterbadge">${IC.clock.replace("<svg", '<svg width="12" height="12"')}Saved for later</span>` : ""}</span>
     <h3>${esc(c.name)}</h3>
     <p>${esc(c.description)}</p>
     ${c.sharesWith && c.sharesWith.length ? `<span class="shares">${IC.leaf}Shares ${esc(c.sharesWith.join(", "))}</span>` : ""}
@@ -1337,6 +1457,7 @@ function cand(c){
     ${voteRow(c)}
     <div class="acts">
       <button class="btn small" data-action="reject" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.x}Pass</button>
+      <button class="btn small" data-action="later" data-id="${c.id}" ${isP ? "disabled" : ""}>${IC.clock}Later</button>
       <button class="btn small ${isP ? "" : "primary"}" data-action="pick" data-id="${c.id}" ${!isP && full ? "disabled" : ""}>${isP ? "Picked · undo" : IC.check + "Pick"}</button>
     </div></article>`;
 }
@@ -1570,7 +1691,7 @@ document.addEventListener("click", async e => {
   const a = el.dataset.action, id = el.dataset.id, v = el.dataset.v;
   if (a === "scrim") { if (e.target === el) { S.sheet = null; S.armed = null; renderSheet(); } return; }
   if (a === "got") return; /* checkbox: handled on change */
-  if (!["clear-done","delete","signout","leave"].includes(a)) S.armed = null;
+  if (!["clear-done","delete","signout","leave","clearideas"].includes(a)) S.armed = null;
   const s = S.settings;
   switch (a){
     case "go": S.view = v; S.sheet = null; render(); window.scrollTo(0, 0); break;
@@ -1603,13 +1724,30 @@ document.addEventListener("click", async e => {
     case "generate": S.open.settings = false; suggest(initialCount(), { fresh: S.plan.candidates.length > 0, withFavorites: true }); break;
     case "more": suggest(5); break;
     case "pick": {
-      const c = S.plan.candidates.find(x => x.id === id); if (!c) break;
-      if (c.status === "picked") unpickCandidate(c); else pickCandidate(c);
+      const c = findCard(id); if (!c) break;
+      const inList = S.plan.candidates.includes(c);
+      if (c.status === "picked") {
+        if (c.fromBox && !inList) { const r = S.recipes[c.favId]; if (r) { r.inPlan = false; saveRecipe(r); } c.status = "open"; delete c.recipeId; syncCandidates(); }
+        else unpickCandidate(c);
+      } else {
+        if (!inList) S.plan.candidates = [...S.plan.candidates, c];
+        pickCandidate(c);
+        if (c.status !== "picked" && !inList) S.plan.candidates = S.plan.candidates.filter(x => x !== c);
+        else if (c.status === "picked" && S.view === "search") toast(`Added to this week (${weekCount()} of ${s.meals}).`);
+      }
       render(); break; }
     case "reject": {
-      const c = S.plan.candidates.find(x => x.id === id); if (!c) break;
-      S.plan.candidates = S.plan.candidates.filter(x => x.id !== id); S.plan.rejected = [...S.plan.rejected, c.name].slice(-200);
+      const c = findCard(id); if (!c) break;
+      S.plan.candidates = S.plan.candidates.filter(x => x.id !== id); S.search.ai = S.search.ai.filter(x => x.id !== id); S.search.box = S.search.box.filter(x => x.id !== id);
+      if (!c.favId) S.plan.rejected = [...S.plan.rejected, c.name].slice(-200);
       persist("plan"); render(); break; }
+    case "later": { const c = findCard(id); if (!c || c.status === "picked") break; saveForLater(c); render(); break; }
+    case "laternow": { const l = laterList(); S.plan.later = []; S.plan.candidates = [...S.plan.candidates, ...l.map(x => ({ ...x, id: uid(), status: "open", later: true }))]; persist("plan"); render(); break; }
+    case "clearideas": if (S.armed !== "clearideas") { S.armed = "clearideas"; render(); break; }
+      S.armed = null; S.plan.candidates = S.plan.candidates.filter(c => c.status === "picked"); persist("plan"); render(); toast("Ideas cleared. Your picks are still on the plan."); break;
+    case "search": { const i = document.getElementById("sq"); if (i) { S.search.q = i.value; i.blur(); } runSearch(); break; }
+    case "searchtip": S.search.q = v; runSearch(); break;
+    case "searchmore": runSearch(true); break;
     case "settings": openSettings(); break;
     case "install": if (installPrompt) { installPrompt.prompt(); const r = await installPrompt.userChoice.catch(() => null); if (r && r.outcome === "accepted") installPrompt = null; renderSheet(); } break;
     case "buildshop": if (pendingRecipes().length) { toast("Wait for the recipes to finish writing."); break; } await buildShopping(); S.view = "shopping"; render(); window.scrollTo(0, 0); break;
@@ -1692,12 +1830,14 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.sheet) { S.sheet = null; renderSheet(); }
+  if (e.key === "Enter" && e.target.id === "sq") { e.preventDefault(); document.querySelector('[data-action="search"]')?.click(); }
   if (e.key === "Enter" && e.target.id === "req") { e.preventDefault(); e.target.blur(); document.querySelector('[data-action="generate"]')?.click(); }
 });
 function bind(t){
   const k = t.dataset.bind;
   if (k === "requests") { S.settings.requests = t.value; persist("settings"); }
   else if (k === "filter.q") S.filter.q = t.value;
+  else if (k === "search.q") S.search.q = t.value;
   else if (k.startsWith("draft.") && S.sheet && S.sheet.draft) S.sheet.draft[k.slice(6)] = t.value;
 }
 document.addEventListener("toggle", e => {

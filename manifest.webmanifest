@@ -1,17 +1,32 @@
 {
-  "name": "Mealboard",
-  "short_name": "Mealboard",
+  "name": "YeahBuddy Meals",
+  "short_name": "YeahBuddy",
   "description": "Plan the week's meals, build the shopping list and keep your family's recipes.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F1F3EE",
-  "theme_color": "#2D6A4C",
+  "background_color": "#F3F6FC",
+  "theme_color": "#1F4FD1",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
