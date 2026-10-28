@@ -235,7 +235,8 @@ details.settings[open]>summary{margin-bottom:16px}
 .top .gear:hover{color:#fff;background:rgba(255,255,255,.22)}
 .top .gdot{border-color:var(--hdr)}
 .top .gdot:not(.warn){background:var(--teal)}
-.tabs{grid-template-columns:repeat(5,1fr)}
+.tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+@media (max-width:859px){.tab{font-size:.7rem;padding:6px 2px}.tab svg{width:21px;height:21px}}
 @media (min-width:860px){
   .tabs{background:var(--hdr-soft)}
   .top .tab{color:var(--hdr-ink);opacity:.85}
@@ -299,6 +300,39 @@ details.settings[open]>summary{margin-bottom:16px}
 .hrow .hb{display:flex;gap:6px}
 .hrow.cur .ht::after{content:"Current";margin-left:8px;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--teal-soft);color:var(--teal-text)}
 .previewbar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:var(--r);background:var(--gold-soft);font-size:.92rem}
+/* round 3: pantry */
+.checksec{border-color:var(--cta);background:#FFF6EE}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .checksec{background:#2A1E14}}
+:root[data-theme="dark"] .checksec{background:#2A1E14}
+.checksec .item{grid-template-columns:minmax(0,1fr) auto}
+.yn{display:flex;gap:6px;flex:none}
+.yn .btn{min-height:36px;padding:5px 12px;font-size:.86rem;border-radius:999px}
+.yn .have{background:var(--teal);border-color:var(--teal);color:var(--teal-ink)}
+.havel{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:.85rem;color:var(--muted)}
+.havel .chip{min-height:30px;padding:3px 10px;font-size:.8rem}
+.useline{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:8px 14px;border:0;border-radius:10px;background:var(--teal-soft);color:var(--teal-text);font-weight:700;font-size:.9rem;text-align:left;margin-bottom:12px}
+.useline svg{width:18px;height:18px;flex:none}
+.usebody{margin:-4px 0 14px;padding:10px 14px 12px;border-radius:0 0 10px 10px;background:var(--teal-soft);font-size:.92rem}
+.usebody ul{margin:4px 0 0;padding-left:20px}
+.buy{display:block;font-size:.8rem;color:var(--muted);font-weight:400}
+.pantrytools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;margin-bottom:16px}
+.ptool{display:flex;align-items:center;gap:12px;min-height:64px;padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);font-weight:700;text-align:left;cursor:pointer}
+.ptool svg{width:26px;height:26px;color:var(--accent);flex:none}
+.ptool small{display:block;font-weight:400;color:var(--muted);font-size:.82rem}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.prow:first-of-type{border-top:0}
+.prow .pn{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.prow .pn small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.ah{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:.8rem;font-weight:700;color:var(--muted);white-space:nowrap}
+.ah svg{width:14px;height:14px}
+.ah[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.snaplist{display:flex;flex-direction:column;gap:2px;margin:8px 0 12px}
+.snaplist label{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 2px;font-weight:700}
+.snaplist input{width:20px;height:20px;accent-color:var(--accent)}
+.snaplist small{font-weight:400;color:var(--muted)}
+#scanRoot video{width:100%;max-height:52vh;border-radius:12px;background:#000;object-fit:cover}
+.scanframe{position:relative}
+.scanframe::after{content:"";position:absolute;left:12%;right:12%;top:38%;bottom:38%;border:3px solid #fff;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
 /* additions for the standalone build */
 html,body{margin:0}
 body{-webkit-text-size-adjust:100%}
@@ -425,6 +459,7 @@ window.addEventListener("error", function (e) {
   <main id="view"><div class="loading"><span class="spin"></span>Loading your meals…</div></main>
 </div>
 <div id="sheetRoot"></div>
+<div id="scanRoot"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 <script>
 /* =====================================================================
@@ -498,6 +533,9 @@ const IC = {
   right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
   edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 103-6.7L3 8"/><path d="M3 3v5h5M12 8v4l3 2"/></svg>',
+  pantry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="14" height="14" rx="3"/><path d="M7 3h10v4H7zM9 12h6"/></svg>',
+  barcode:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17l-5.7 3.1 1.2-6.3L2.9 9.4l6.3-.8z"/></svg>',
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
 };
 
@@ -536,7 +574,9 @@ const S = {
   search: { q: "", ran: "", box: [], ai: [], busy: false },
   wk: 0,          // week being viewed: 0 = this week, 1-2 = ahead, -1 = past weeks
   shopW: {},      // { weekKey: shopping list } (a combined list carries weeks: [k, next])
-  past: {}        // { weekKey: [{ id, name, category, done }] }
+  past: {},       // { weekKey: [{ id, name, category, done }] }
+  pantry: [],     // [{ id, item, section, note, always, from, addedAt }]
+  snap: null      // shelf photo results waiting for review
 };
 const recipesArr = () => Object.values(S.recipes);
 /* ---------- weeks (Sunday to Saturday, keyed by the Sunday's date) ---------- */
@@ -575,6 +615,7 @@ function docData(key){
   if (key === "plan") { const p = { ...S.plan }; delete p.shopping; return { kind: "plan", ...p }; }
   if (key === "shopping") return { kind: "shopping", weeks: S.shopW };
   if (key === "past") return { kind: "past", weeks: S.past };
+  if (key === "pantry") return { kind: "pantry", items: S.pantry };
   if (key === "extras") return { kind: "extras", items: S.extras };
   if (key.startsWith("votes-")) { const u = key.slice(6); const ids = new Set(S.plan.candidates.map(c => c.id)); const v = {}; Object.entries(S.votes[u] || {}).forEach(([k, x]) => { if (ids.has(k)) v[k] = x; }); return { kind: "votes", uid: u, v }; }
   if (key.startsWith("ratings-")) { const u = key.slice(8); return { kind: "ratings", uid: u, v: S.ratings[u] || {} }; }
@@ -584,7 +625,7 @@ function docData(key){
 }
 function saveLocal(){
   clearTimeout(store.timers.ls);
-  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras, votes: S.votes, ratings: S.ratings, shopW: S.shopW, past: S.past })), 200);
+  store.timers.ls = setTimeout(() => lsSet(LS_KEY, JSON.stringify({ settings: S.settings, plan: S.plan, recipes: S.recipes, extras: S.extras, votes: S.votes, ratings: S.ratings, shopW: S.shopW, past: S.past, pantry: S.pantry })), 200);
 }
 const itemRef = key => store.fb.F.doc(store.fb.db, "households", store.hid, "items", key);
 function persist(key){
@@ -603,7 +644,7 @@ function persist(key){
       .finally(() => { if (store.seq[key] === my) store.pending.delete(key); });
   }, 350);
 }
-const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("past"); persist("extras"); if (S.ratings[myId()]) persist("ratings-" + myId()); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
+const persistAll = () => { persist("settings"); persist("plan"); persist("shopping"); persist("past"); persist("pantry"); persist("extras"); if (S.ratings[myId()]) persist("ratings-" + myId()); recipesArr().forEach(r => persist("r-" + r.id)); if (gemKey()) persist("secrets"); };
 const saveRecipe = r => { S.recipes[r.id] = r; persist("r-" + r.id); };
 function strip(d){ const o = { ...d }; delete o.kind; return o; }
 function applyDoc(id, d){
@@ -612,13 +653,14 @@ function applyDoc(id, d){
   else if (id === "plan") { S.plan = { candidates: [], rejected: [], ...strip(d) }; delete S.plan.shopping; }
   else if (id === "shopping") S.shopW = d.weeks ? d.weeks : migrateShop(d.list);
   else if (id === "past") S.past = d.weeks || {};
+  else if (id === "pantry") S.pantry = Array.isArray(d.items) ? d.items : [];
   else if (id === "extras") S.extras = Array.isArray(d.items) ? d.items : [];
   else if (d.kind === "votes" && d.uid) S.votes[d.uid] = d.v || {};
   else if (d.kind === "ratings" && d.uid) S.ratings[d.uid] = d.v || {};
   else if (id === "secrets") { if (d.geminiKey) lsSet(LS_GEM, d.geminiKey); if (d.geminiModel) lsSet(LS_MODEL, d.geminiModel); }
   else if (d.kind === "recipe" && d.id) S.recipes[d.id] = strip(d);
 }
-function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [] }; S.recipes = {}; S.extras = []; S.votes = {}; S.ratings = {}; S.shopW = {}; S.past = {}; }
+function resetState(){ S.settings = clone(DEFAULT_SETTINGS); S.plan = { candidates: [], rejected: [] }; S.recipes = {}; S.extras = []; S.votes = {}; S.ratings = {}; S.shopW = {}; S.past = {}; S.pantry = []; }
 /* Lists saved before weeks existed belong to this week. */
 function migrateShop(list){
   if (!list || !Array.isArray(list.items)) return {};
@@ -629,7 +671,7 @@ function loadLocal(){
   resetState();
   try {
     const d = JSON.parse(lsGet(LS_KEY) || "null");
-    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; S.votes = d.votes || {}; S.ratings = d.ratings || {}; S.shopW = d.shopW || migrateShop(S.plan.shopping); S.past = d.past || {}; delete S.plan.shopping; }
+    if (d){ S.settings = { ...clone(DEFAULT_SETTINGS), ...(d.settings || {}) }; S.plan = { candidates: [], rejected: [], ...(d.plan || {}) }; S.recipes = d.recipes || {}; S.extras = Array.isArray(d.extras) ? d.extras : []; S.votes = d.votes || {}; S.ratings = d.ratings || {}; S.shopW = d.shopW || migrateShop(S.plan.shopping); S.past = d.past || {}; S.pantry = Array.isArray(d.pantry) ? d.pantry : []; delete S.plan.shopping; }
   } catch {}
 }
 const myId = () => (store && store.user && store.user.uid) || "me";
@@ -951,7 +993,7 @@ ${query ? `The household searched for: "${query}". Suggest exactly ${n} differen
  : `Suggest exactly ${n} different meal ideas. Meal types to cover: ${typesText()}${s.mealTypes.length > 1 ? " (spread them roughly evenly)" : ""}.`}
 Household preferences: ${p.opts}.
 Special requests (follow strictly; treat any allergy as a hard rule and avoid cross-contact ingredients): ${p.req}.
-${favs.length ? "Meals this household rated highly (taste reference only, do not repeat them): " + favs.join("; ") + ".\n" : ""}${exclude.length ? "Do not suggest any of these or close variations: " + exclude.join("; ") + ".\n" : ""}${week.length ? "Meals already chosen or on the list for this week: " + week.join("; ") + ".\n" : ""}${lw ? "Food waste matters to this household: favor ideas that reuse perishable ingredients from the meals above and from each other (the same fresh herbs, vegetables, dairy or protein), so nothing is bought for a single use and left to spoil.\n" : ""}${of > 1 ? `This is batch ${batch} of ${of} requested at the same time. To avoid overlap with the other batch, lean toward ${BATCH_LEAN[(batch - 1) % 2]}, unless the special requests say otherwise.\n` : ""}${recent.length ? "Eaten or planned in the last 2 weeks (do not suggest these or close variations): " + recent.join("; ") + ".\n" : ""}${query ? "Within the search, vary the cooking methods and flavors." : `Vary proteins, cuisines and cooking methods. Make the list feel international: unless the special requests say otherwise, about half the ideas should come from cuisines such as Indian, Mexican, Thai, Chinese, Japanese, Korean, Vietnamese, Mediterranean, Middle Eastern or Latin American, kept weeknight-friendly with ingredients from a regular US grocery store. Use any one cuisine at most twice in the list.`}
+${favs.length ? "Meals this household rated highly (taste reference only, do not repeat them): " + favs.join("; ") + ".\n" : ""}${exclude.length ? "Do not suggest any of these or close variations: " + exclude.join("; ") + ".\n" : ""}${week.length ? "Meals already chosen or on the list for this week: " + week.join("; ") + ".\n" : ""}${lw ? "Food waste matters to this household: favor ideas that reuse perishable ingredients from the meals above and from each other (the same fresh herbs, vegetables, dairy or protein), so nothing is bought for a single use and left to spoil.\n" : ""}${of > 1 ? `This is batch ${batch} of ${of} requested at the same time. To avoid overlap with the other batch, lean toward ${BATCH_LEAN[(batch - 1) % 2]}, unless the special requests say otherwise.\n` : ""}${!query && useUpList().length ? "Already in the kitchen and worth using up (work some of these into the ideas where they fit naturally, and mention them in sharesWith): " + useUpList().join("; ") + ".\n" : ""}${recent.length ? "Eaten or planned in the last 2 weeks (do not suggest these or close variations): " + recent.join("; ") + ".\n" : ""}${query ? "Within the search, vary the cooking methods and flavors." : `Vary proteins, cuisines and cooking methods. Make the list feel international: unless the special requests say otherwise, about half the ideas should come from cuisines such as Indian, Mexican, Thai, Chinese, Japanese, Korean, Vietnamese, Mediterranean, Middle Eastern or Latin American, kept weeknight-friendly with ingredients from a regular US grocery store. Use any one cuisine at most twice in the list.`}
 Reply with only a JSON array of ${n} objects shaped like:
 {"name":"Sheet-Pan Lemon Herb Chicken","description":"One appetizing sentence.","mealType":"dinner","category":"Chicken","cuisine":"Mediterranean","totalMinutes":40,"cost":"$","keyIngredients":["chicken thighs","baby potatoes","lemon"]${lw ? ',"sharesWith":["lemon","parsley"]' : ""}}${lw ? "\nsharesWith lists the perishable ingredients this idea shares with the meals above or with other ideas in your list (empty if none)." : ""}
 mealType is one of: ${query ? TYPES.map(t => t[0]).join(", ") : typesText()}. category is one of: ${CATS.join(", ")}. cost is "$" (cheap), "$$" or "$$$".`;
@@ -1251,14 +1293,13 @@ async function buildShopping(k = viewKey(), mode = "keep"){
   if (!recipes.length) { delete S.shopW[owner]; persist("shopping"); return; }
   S.busy = { kind: "shop", label: "Building your shopping list", sub: "Combining ingredients across meals." }; render();
   const prompt =
-`Make one combined grocery shopping list for these recipes${weeks.length > 1 ? " (two weeks of meals bought in one trip; keep very perishable items like fresh fish and soft herbs in amounts that still make sense)" : ""}. Add up the same ingredient across recipes and turn amounts into what a shopper buys (for example "2 lb", "1 bunch", "1 (14 oz) can", "3 medium").
+`Make one combined grocery shopping list for these recipes${weeks.length > 1 ? " (two weeks of meals bought in one trip; keep very perishable items like fresh fish and soft herbs in amounts that still make sense)" : ""}. Add up the same ingredient across recipes. quantity is the total the recipes call for, in plain everyday units a shopper can grab: count whole produce ("2 onions", "3 cloves garlic", "1 lemon") and use the recipe's measure otherwise ("1 1/2 lb chicken thighs", "1 cup sour cream"). Never give bag or package sizes like "1 bag of onions" or "3 lb bag". Only when an item is sold solely in a bigger package than needed (a bunch of herbs, a carton of cream, a can), also set buy to what to pick up, for example "1 bunch".
 ${recipes.map(r => "## " + r.name + "\n" + r.ingredients.map(i => "- " + ingText(i)).join("\n")).join("\n\n")}
 
-${lowWaste() ? `Buy the smallest amounts that cover the recipes, in sizes stores actually sell.
-Reply with only a JSON object shaped like:
-{"items":[{"section":"Produce","item":"Fresh cilantro","quantity":"1 bunch","meals":["Exact recipe name"],"pantry":false,"leftover":"about 1/2 bunch"}],"useItUp":["Stir the leftover cilantro into Thursday's rice or freeze it chopped in oil."]}
+${lowWaste() ? `Reply with only a JSON object shaped like:
+{"items":[{"section":"Produce","item":"Fresh cilantro","quantity":"1/2 cup chopped","buy":"1 bunch","meals":["Exact recipe name"],"pantry":false,"leftover":"about 1/2 bunch"}],"useItUp":["Stir the leftover cilantro into Thursday's rice or freeze it chopped in oil."]}
 leftover is what will remain after cooking every recipe, only for perishable items (fresh produce, herbs, dairy, meat, bread, opened cans); use "" when little or nothing is left. useItUp has up to 4 short, practical ideas for using those leftovers.` : `Reply with only a JSON array of objects shaped like:
-{"section":"Produce","item":"Yellow onions","quantity":"3 medium","meals":["Exact recipe name"],"pantry":false}`}
+{"section":"Produce","item":"Yellow onions","quantity":"2 onions","buy":"","meals":["Exact recipe name"],"pantry":false}`}
 section is one of: ${SECTIONS.join(", ")}. Set pantry to true for staples most kitchens already have (salt, pepper, cooking oil, flour, sugar, common dried spices).`;
   let items, useItUp = [];
   try {
@@ -1266,7 +1307,7 @@ section is one of: ${SECTIONS.join(", ")}. Set pantry to true for staples most k
     let arr = Array.isArray(out) ? out : (out && out.items) || [];
     if (out && Array.isArray(out.useItUp)) useItUp = out.useItUp.map(String).filter(Boolean).slice(0, 4);
     items = arr.filter(x => x && x.item).map(x => ({ section: SECTIONS.includes(x.section) ? x.section : "Other", item: String(x.item), quantity: String(x.quantity || ""),
-      meals: Array.isArray(x.meals) ? x.meals.map(String) : [], pantry: !!x.pantry, got: false, leftover: String(x.leftover || "").trim() }));
+      meals: Array.isArray(x.meals) ? x.meals.map(String) : [], pantry: !!x.pantry, got: false, leftover: String(x.leftover || "").trim(), buy: String(x.buy || "").trim() }));
     if (!items.length) throw { code: "invalid_json" };
   } catch (e) {
     console.error(e);
@@ -1332,8 +1373,95 @@ If you can't open the page or it has no recipe, reply {"error":"short reason"}.`
   S.busy = null; renderSheet();
 }
 
+/* ---------- pantry ---------- */
+const PSTOP = new Set(["fresh","large","medium","small","whole","chopped","diced","sliced","minced","dried","organic","boneless","skinless","raw","plain","unsalted","salted","extra","virgin","low","sodium","reduced","fat","free","can","cans","canned","jar","bag","box","package","pack","bunch","of","the","a","and","or","to","taste","for","lb","oz","cup","cups"]);
+const ptoks = name => String(name || "").toLowerCase().replace(/\(.*?\)/g, " ").split(/[^a-z]+/).filter(w => w.length > 1 && !PSTOP.has(w)).map(w => w.replace(/(ies)$/, "y").replace(/(oes|ches|shes|sses)$/, m => m.slice(0, -2)).replace(/([^s])s$/, "$1"));
+/* A pantry item matches a list item when all of one's key words are in the other ("onions" ~ "yellow onion"). */
+function pantryMatch(name){
+  const a = ptoks(name); if (!a.length) return null;
+  return S.pantry.find(p => { const b = ptoks(p.item); return b.length && (b.every(w => a.includes(w)) || a.every(w => b.includes(w))); }) || null;
+}
+function addPantry(names, { from = "manual", note = "", section = null } = {}){
+  const out = [];
+  for (const raw of names) {
+    const item = String(raw.item || raw).trim().slice(0, 120); if (!item) continue;
+    if (S.pantry.some(p => p.item.toLowerCase() === item.toLowerCase()) || out.some(p => p.item.toLowerCase() === item.toLowerCase())) continue;
+    out.push({ id: uid(), item, section: SECTIONS.includes(raw.section) ? raw.section : (section || guessSection(item)), note: raw.note != null ? String(raw.note) : note, always: false, from, addedAt: Date.now() });
+  }
+  if (out.length) { S.pantry = [...S.pantry, ...out]; persist("pantry"); }
+  return out;
+}
+/* Pantry items to work into meal ideas (staples you always have don't need using up). */
+const useUpList = () => S.pantry.filter(p => !p.always).map(p => p.item + (p.note ? ` (${p.note})` : "")).slice(0, 25);
+async function snapShelf(files){
+  if (!files.length || S.busy) return;
+  if (!gemKey()) { openSettings(); toast(aiErr({ code: "no_key" })); return; }
+  S.busy = { kind: "snap", label: files.length > 1 ? `Looking at ${files.length} photos` : "Looking at your shelf", sub: "This can take up to a minute." }; render();
+  try {
+    let arr = await askJSON(`These photos show part of a home kitchen: a pantry shelf, cupboard, fridge or freezer. List the food and cooking ingredients you can clearly see.
+Use plain grocery names a shopper would use ("peanut butter", "canned black beans", "eggs"), one entry per product, no brand names unless it's the only way to tell what it is. Skip non-food items and anything you can't identify.
+Reply with only a JSON array of objects shaped like:
+{"item":"Canned black beans","section":"Pantry","note":"2 cans"}
+section is one of: ${SECTIONS.join(", ")}. note is a rough amount if you can see it, otherwise "".`, { images: files });
+    if (!Array.isArray(arr)) arr = (arr && (arr.items || arr.foods)) || [];
+    const have = new Set(S.pantry.map(p => p.item.toLowerCase()));
+    const items = arr.filter(x => x && x.item).map(x => ({ item: String(x.item).slice(0, 120), section: SECTIONS.includes(x.section) ? x.section : guessSection(String(x.item)), note: String(x.note || ""), on: !have.has(String(x.item).toLowerCase()), dup: have.has(String(x.item).toLowerCase()) }));
+    if (!items.length) toast("Couldn't make out any food in that photo. Try closer, with more light.");
+    else S.snap = { items };
+  } catch (e) { console.error(e); toast(aiErr(e)); }
+  S.busy = null; render();
+}
+/* ---------- barcode: camera + Open Food Facts ---------- */
+const scan = { stream: null, timer: null };
+function stopScan(){ if (scan.timer) clearInterval(scan.timer); scan.timer = null; if (scan.stream) scan.stream.getTracks().forEach(t => t.stop()); scan.stream = null; const r = document.getElementById("scanRoot"); if (r) r.innerHTML = ""; document.body.style.overflow = ""; }
+async function lookupBarcode(code){
+  code = String(code || "").replace(/\D/g, "");
+  if (code.length < 8) { toast("That barcode looks too short. Check the numbers under the bars."); return; }
+  const msg = document.getElementById("scanmsg"); if (msg) msg.textContent = "Looking up " + code + "…";
+  try {
+    const res = await withTimeout(fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,generic_name,brands,quantity,categories_tags`), 12000, "barcode lookup");
+    const j = await res.json();
+    const pr = j && j.status === 1 && j.product;
+    const name = pr && (pr.generic_name || pr.product_name);
+    if (!name) { if (msg) msg.textContent = "Not found in Open Food Facts. Type the item in the Pantry instead."; toast("That product isn't in the Open Food Facts database."); return; }
+    const brand = pr.brands ? String(pr.brands).split(",")[0].trim() : "";
+    const label = pr.product_name && brand && !String(pr.product_name).toLowerCase().includes(brand.toLowerCase()) ? `${pr.product_name} (${brand})` : (pr.product_name || name);
+    const cats = (pr.categories_tags || []).join(" ");
+    const sec = /dair|chees|milk|yogurt|egg/.test(cats) ? "Dairy & Eggs" : /frozen/.test(cats) ? "Frozen" : /spice|condiment|sauce/.test(cats) ? "Spices & Condiments" : /meat|fish|seafood/.test(cats) ? "Meat & Seafood" : /fruit|vegetable/.test(cats) && !/canned/.test(cats) ? "Produce" : /bread/.test(cats) ? "Bakery" : guessSection(label) === "Other" ? "Pantry" : guessSection(label);
+    const added = addPantry([{ item: label, section: sec, note: pr.quantity || "" }], { from: "barcode" });
+    stopScan(); render();
+    toast(added.length ? `Added ${label} to your pantry.` : `${label} is already in your pantry.`);
+  } catch (e) { console.error(e); if (msg) msg.textContent = "Couldn't reach Open Food Facts. Check your connection."; }
+}
+async function openScanner(){
+  const root = document.getElementById("scanRoot");
+  const live = "BarcodeDetector" in window && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+  root.innerHTML = `<div class="scrim" data-action="scanclose"><div class="sheet" role="dialog" aria-modal="true" aria-label="Scan a barcode">
+    <div class="sheet-head"><h2>Scan a barcode</h2><button class="x" data-action="scanclose" aria-label="Close">${IC.x}</button></div>
+    ${live ? `<div class="scanframe"><video id="scanvid" playsinline muted autoplay></video></div><p class="hint" id="scanmsg" style="margin:10px 0">Hold the barcode inside the box.</p>`
+      : `<p class="muted" id="scanmsg" style="margin:0 0 12px">This browser can't read barcodes with the camera (iPhones can't yet). Type the numbers printed under the barcode instead.</p>`}
+    <div class="field"><label for="bcode">Or type the barcode number</label><div class="joinrow"><input type="text" id="bcode" inputmode="numeric" autocomplete="off" placeholder="0 12345 67890 5"><button class="btn small primary" data-action="bcodego">Look up</button></div></div>
+    <p class="hint" style="margin-top:10px">Product details come from Open Food Facts, a free food database.</p></div></div>`;
+  document.body.style.overflow = "hidden";
+  if (!live) return;
+  try {
+    scan.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    const v = document.getElementById("scanvid"); if (!v) { stopScan(); return; }
+    v.srcObject = scan.stream; await v.play().catch(() => {});
+    const det = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e"] });
+    let busy = false;
+    scan.timer = setInterval(async () => {
+      if (busy || !v.videoWidth) return; busy = true;
+      try { const found = await det.detect(v); if (found && found[0]) { clearInterval(scan.timer); scan.timer = null; await lookupBarcode(found[0].rawValue); } } catch {}
+      busy = false;
+    }, 350);
+  } catch (e) {
+    const m = document.getElementById("scanmsg"); if (m) m.textContent = "Couldn't open the camera. Allow camera access, or type the number below.";
+  }
+}
 /* ---------- shopping list: items you add yourself ---------- */
 const SECTION_WORDS = [
+  ["Pantry", /\b(canned|can of|cans of|jar of|dried|dry)\b/i],
   ["Produce", /\b(apple|banana|berr|lettuce|spinach|kale|onion|garlic|potato|tomato|pepper|carrot|celery|cucumber|avocado|lemon|lime|orange|grape|melon|broccoli|cauliflower|zucchini|squash|mushroom|cilantro|parsley|basil|herb|ginger|scallion|salad|fruit|veg|cabbage|corn on)/i],
   ["Meat & Seafood", /\b(chicken|beef|pork|steak|ground|turkey|bacon|sausage|ham|salmon|shrimp|fish|tuna|cod|tilapia|lamb|ribs?)\b/i],
   ["Dairy & Eggs", /\b(milk|cheese|butter|yogurt|yoghurt|cream|eggs?|sour cream|half and half|creamer)\b/i],
@@ -1412,15 +1540,18 @@ function toast(msg){ const t = document.getElementById("toast"); t.textContent =
 /* ---------- render: shell ---------- */
 function render(){
   const n = openMeals().length;
-  const shopLeft = shopRows().filter(i => !i.got && !i.pantry).length;
-  const tabs = [["plan","Plan",IC.plan,n],["generate","Suggest",IC.gen,0],["search","Search",IC.search,0],["shopping","Shop",IC.shop,shopLeft],["recipes","Recipes",IC.box,0]];
+  const shopLeft = shopRows().filter(i => !i.got && !expired(i) && !["have", "always"].includes(checkState(i))).length;
+  const tabs = [["plan","Plan",IC.plan,n],["generate","Suggest",IC.gen,0],["search","Search",IC.search,0],["shopping","Shop",IC.shop,shopLeft],["pantry","Pantry",IC.pantry,0],["recipes","Recipes",IC.box,0]];
   document.getElementById("tabs").innerHTML = tabs.map(([k, l, ic, b]) =>
     `<button class="tab" data-action="go" data-v="${k}" ${S.view === k ? 'aria-current="page"' : ""}>${ic}<span>${l}</span>${b ? `<span class="badge">${b}</span>` : ""}</button>`).join("");
   if (S.loaded && S.archivedFor !== curKey()) archiveWeeks();
+  if (S.loaded && S.extras.some(expired)) { S.extras = S.extras.filter(x => !expired(x)); persist("extras"); }
+  if (S.loaded) { let ch = false; for (const it of S.extras) if (it.got && !it.gotAt) { it.gotAt = Date.now(); ch = true; } if (ch) persist("extras");
+    for (const l of Object.values(S.shopW)) { let c2 = false; for (const it of l.items || []) if (it.got && !it.gotAt) { it.gotAt = Date.now(); c2 = true; } if (c2) persist("shopping"); } }
   document.getElementById("weekbar").innerHTML = weekBar();
   document.getElementById("acct").innerHTML = gearBtn();
   if (!S.loaded) return;
-  document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : S.view === "search" ? vSearch() : vGenerate());
+  document.getElementById("view").innerHTML = joinBanner() + (S.view === "plan" ? vPlan() : S.view === "shopping" ? vShopping() : S.view === "recipes" ? vRecipes() : S.view === "search" ? vSearch() : S.view === "pantry" ? vPantry() : vGenerate());
   renderSheet();
 }
 function weekBar(){
@@ -1669,6 +1800,19 @@ function sSettings(){
 }
 
 /* ---------- view: shopping ---------- */
+const CART_MS = 2 * 3600e3;
+/* Checked items leave the list 2 hours after they were checked. */
+const expired = it => it.got && it.gotAt && Date.now() - it.gotAt > CART_MS;
+/* Items to ask about: staples the recipes use, and anything already in the pantry. "Always have" items count as had. */
+function checkState(it){
+  if (it.added || it.got || it.need) return "";
+  if (it.have) return "have";
+  const m = pantryMatch(it.item);
+  if (m && m.always) return "always";
+  return m || it.pantry ? "ask" : "";
+}
+function rowItem(k){ if (!k) return null; if (k[0] === "m") { const l = shopFor().list; return (l && l.items[Number(k.slice(1))]) || null; } return S.extras.find(x => "x" + x.id === k) || null; }
+const persistRow = k => persist(k[0] === "m" ? "shopping" : "extras");
 function shopRows(k = viewKey()){
   const sf = shopFor(k), ws = listWeeks(sf), cur = curKey();
   const rows = sf.list ? sf.list.items.map((it, i) => ({ ...it, key: "m" + i })) : [];
@@ -1683,7 +1827,7 @@ function vShopping(){
   const combo = combined ? `<div class="combo"><span><strong>One trip for 2 weeks:</strong> ${esc(weekName(ws[0]))} and ${esc(weekLower(ws[1]))}${sf.owner !== k ? ". This list was made from " + esc(weekLower(sf.owner)) + "." : "."}</span><button class="btn small" data-action="separate">Separate lists</button></div>`
     : canCombine ? `<div class="combo"><span>Shopping once for both ${esc(weekLower(k))} and ${esc(weekLower(nextK))}?</span><button class="btn small" data-action="combine" ${pend ? "disabled" : ""}>Combine 2 weeks</button></div>` : "";
   const head = `<div class="view-head"><div><h2>Shopping list</h2><p>${sh ? `${esc(combined ? "2 weeks" : weekName(k))} · ${nMeals} meal${nMeals === 1 ? "" : "s"} · ${S.settings.people} people` : `${esc(weekName(k))} · built from the meals you plan, plus anything you add.`}</p></div>
-    ${rows.length ? `<div class="row"><button class="chip" data-action="hidepantry" aria-pressed="${S.hidePantry}">Hide pantry staples</button><button class="btn small" data-action="copy">${IC.copy}Copy list</button><button class="btn small quiet" data-action="settings" title="Change the order of store sections">Aisle order</button></div>` : ""}</div>`;
+    ${rows.length ? `<div class="row"><button class="btn small" data-action="copy">${IC.copy}Copy list</button><button class="btn small quiet" data-action="settings" title="Change the order of store sections">Aisle order</button></div>` : ""}</div>`;
   const addBox = `<section class="panel addbox"><label class="lbl" for="addtxt">Add items</label>
     <textarea id="addtxt" rows="2" placeholder="Type items, or paste the shopping list text Alexa sends you"></textarea>
     <div class="row"><button class="btn small primary" data-action="addextras">${IC.plus}Add to list</button><span class="hint">Items you add stay on the list when it's rebuilt.</span></div></section>`;
@@ -1697,22 +1841,53 @@ function vShopping(){
     top = `<div class="notice"><span>${pend ? "Some recipes are still being written." : "Your meals or recipes changed since this list was made."}</span><button class="btn small" data-action="buildshop" ${pend ? "disabled" : ""}>Update list</button></div>`;
   }
   top = combo + top;
-  // unchecked items stay in their aisle; checked ones drop to "In the cart" at the bottom
-  const visible = rows.filter(it => !(S.hidePantry && it.pantry));
-  const groups = aisleOrder().map(sec => [sec, visible.filter(it => it.section === sec && !it.got)]).filter(g => g[1].length);
+  // ask about pantry items first; unchecked items stay in their aisle; checked ones drop to "In the cart" and clear after 2 hours
+  const visible = rows.filter(it => !expired(it));
+  const st = new Map(visible.map(it => [it.key, checkState(it)]));
+  const ask = visible.filter(it => st.get(it.key) === "ask");
+  const had = visible.filter(it => st.get(it.key) === "have" || st.get(it.key) === "always");
+  const groups = aisleOrder().map(sec => [sec, visible.filter(it => it.section === sec && !it.got && !st.get(it.key))]).filter(g => g[1].length);
   const inCart = visible.filter(it => it.got);
   if (inCart.length) groups.push(["In the cart", inCart, true]);
+  const checkBox = ask.length || had.length ? `<section class="panel aisle checksec"><h3><b class="sec">Check if you have this</b><span>${ask.length ? `${ask.length} to check` : "all checked"}</span></h3>
+    ${ask.map(it => { const m = pantryMatch(it.item); return `<div class="item"><span class="nm">${esc(it.item)}${it.quantity ? ` <span class="muted" style="font-weight:400">· ${esc(it.quantity)}</span>` : ""}<span class="for">${esc(m ? "In your pantry" + (m.note ? " (" + m.note + ")" : "") : "Most kitchens have this")}${it.meals.length ? " · " + esc(it.meals.join(", ")) : ""}</span></span>
+      <span class="yn"><button class="btn have" data-action="haveit" data-k="${it.key}">Have it</button><button class="btn" data-action="needit" data-k="${it.key}">Need it</button></span></div>`; }).join("")}
+    ${had.length ? `<div class="havel"><span>Already have:</span>${had.map(it => `<button class="chip" data-action="unhave" data-k="${it.key}" title="Put back on the list">${esc(it.item)}${st.get(it.key) === "always" ? " ★" : ""}</button>`).join("")}</div>` : ""}</section>` : "";
   const left = sh ? sh.items.filter(i => i.leftover) : [];
-  const useUp = sh && ((sh.useItUp && sh.useItUp.length) || left.length) ? `<section class="panel useup"><h3>${IC.leaf}Use it up</h3>
-    ${left.length ? `<p class="muted" style="margin:0 0 6px">${left.length} item${left.length > 1 ? "s" : ""} will have some left over after these meals.</p>` : ""}
-    ${sh.useItUp && sh.useItUp.length ? `<ul>${sh.useItUp.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</section>` : "";
-  return head + top + addBox + useUp + `<div class="shop">${groups.map(([sec, items, cart]) => `<section class="panel aisle ${cart ? "cart" : ""}"><h3><b class="sec">${cart ? IC.check : ""}${esc(sec)}</b><span>${cart ? `${items.length} item${items.length > 1 ? "s" : ""}` : `${items.length} left`}</span></h3>
+  const ideas = sh && sh.useItUp ? sh.useItUp : [];
+  const useUp = left.length || ideas.length ? `<button class="useline" data-action="useline" aria-expanded="${!!S.open.useup}"><span>${IC.leaf.replace("<svg", '<svg style="vertical-align:-4px;margin-right:6px"')}${left.length ? `${left.length} item${left.length > 1 ? "s" : ""} will have leftovers` : "Ideas to use leftovers"} · ${S.open.useup ? "hide" : "see ideas"}</span>${IC.chev}</button>
+    ${S.open.useup ? `<div class="usebody">${left.length ? `<div><strong>Left over:</strong> ${esc(left.map(i => `${i.item} (${i.leftover})`).join(", "))}. They go into your Pantry when you check them off.</div>` : ""}${ideas.length ? `<ul>${ideas.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}</div>` : ""}` : "";
+  return head + top + useUp + checkBox + addBox + `<div class="shop">${groups.map(([sec, items, cart]) => `<section class="panel aisle ${cart ? "cart" : ""}"><h3><b class="sec">${cart ? IC.check : ""}${esc(sec)}</b><span>${cart ? `${items.length} item${items.length > 1 ? "s" : ""} · clear 2 hours after checking` : `${items.length} left`}</span></h3>
     ${items.map(it => `<div class="item ${it.got ? "got" : ""} ${it.added ? "isx" : ""}"><input type="checkbox" id="chk-${it.key}" data-action="got" data-k="${it.key}" ${it.got ? "checked" : ""}>
-      <label class="nm" for="chk-${it.key}">${esc(it.item)}${it.pantry ? '<span class="tag">pantry</span>' : ""}${it.added ? '<span class="tag">added</span>' : ""}${it.meals.length ? `<span class="for">${esc(it.meals.join(", "))}</span>` : ""}${it.leftover ? `<span class="left">${IC.leaf}${esc(it.leftover)} left over</span>` : ""}</label>
+      <label class="nm" for="chk-${it.key}">${esc(it.item)}${it.added ? '<span class="tag">added</span>' : ""}${it.buy && !it.got ? `<span class="buy">Buy ${esc(it.buy)}</span>` : ""}${it.meals.length ? `<span class="for">${esc(it.meals.join(", "))}</span>` : ""}${it.leftover ? `<span class="left">${IC.leaf}${esc(it.leftover)} left over</span>` : ""}</label>
       <span class="qty">${esc(it.quantity)}</span>${it.added ? `<button class="rmx" data-action="rmx" data-id="${it.id}" aria-label="Remove ${esc(it.item)}">${IC.x}</button>` : ""}</div>`).join("")}
   </section>`).join("")}</div>`;
 }
 
+/* ---------- view: pantry ---------- */
+function vPantry(){
+  const P = S.pantry;
+  const head = `<div class="view-head"><div><h2>Pantry</h2><p>${P.length ? `${P.length} item${P.length === 1 ? "" : "s"} · ${P.filter(p => p.always).length} you always have` : "What's already in your kitchen."}</p></div>
+    ${P.filter(p => !p.always).length ? `<button class="btn small ${S.armed === "pclear" ? "armed" : "quiet"}" data-action="pclear">${S.armed === "pclear" ? "Tap again to clear" : "Clear pantry"}</button>` : ""}</div>`;
+  const tools = `<div class="pantrytools">
+    <label class="ptool" for="shelf">${IC.cam}<span>Snap your shelf<small>Take a photo of a shelf or the fridge</small></span></label>
+    <input type="file" id="shelf" accept="image/*" capture="environment" multiple class="sr">
+    <button class="ptool" data-action="scan">${IC.barcode}<span>Scan a barcode<small>Add one product at a time</small></span></button></div>`;
+  const add = `<section class="panel addbox"><label class="lbl" for="padd">Add items</label>
+    <div class="joinrow"><input type="text" id="padd" placeholder="Rice, olive oil, canned tomatoes" autocomplete="off" enterkeyhint="done"><button class="btn small primary" data-action="pantryadd">${IC.plus}Add</button></div>
+    <span class="hint">Tap ★ on things you always keep stocked (salt, oil, rice). They're skipped on the shopping list. Other items get worked into meal ideas.</span></section>`;
+  let snap = "";
+  if (S.busy && S.busy.kind === "snap") snap = busyBox();
+  else if (S.snap) snap = `<section class="panel" style="margin-bottom:16px"><h3 style="font-size:1.1rem">Found ${S.snap.items.length} item${S.snap.items.length === 1 ? "" : "s"}</h3><p class="hint" style="margin:4px 0 0">Untick anything that's wrong, then add the rest.</p>
+    <div class="snaplist">${S.snap.items.map((x, i) => `<label><input type="checkbox" data-action="snaptick" data-i="${i}" ${x.on ? "checked" : ""}>${esc(x.item)}${x.note ? ` <small>· ${esc(x.note)}</small>` : ""}${x.dup ? ` <small>· already in pantry</small>` : ""}</label>`).join("")}</div>
+    <div class="row"><button class="btn primary small" data-action="snapsave">Add ${S.snap.items.filter(x => x.on).length} to pantry</button><button class="btn small quiet" data-action="snapcancel">Cancel</button></div></section>`;
+  const list = !P.length ? `<div class="empty"><h3>Your pantry is empty</h3><p>Add what you have, and the shopping list will ask "Have it or need it?" instead of making you buy it again. Leftovers land here too.</p></div>`
+    : `<div class="shop">${aisleOrder().map(sec => [sec, P.filter(p => (p.section || "Other") === sec).sort((a, b) => (b.always - a.always) || a.item.localeCompare(b.item))]).filter(g => g[1].length).map(([sec, items]) => `<section class="panel aisle"><h3><b class="sec">${esc(sec)}</b><span>${items.length}</span></h3>
+      ${items.map(p => `<div class="prow"><span class="pn">${esc(p.item)}<small>${esc([p.note, p.from === "leftover" ? "leftover" : p.from === "barcode" ? "scanned" : p.from === "snap" ? "from a photo" : ""].filter(Boolean).join(" · "))}</small></span>
+        <button class="ah" data-action="palways" data-id="${p.id}" aria-pressed="${!!p.always}" title="Always have">${IC.pin}Always have</button>
+        <button class="rmx" data-action="prm" data-id="${p.id}" aria-label="Used up: remove ${esc(p.item)}">${IC.x}</button></div>`).join("")}</section>`).join("")}</div>`;
+  return head + tools + snap + add + list;
+}
 /* ---------- view: recipes ---------- */
 function filteredRecipes(){
   const f = S.filter;
@@ -1905,7 +2080,7 @@ document.addEventListener("click", async e => {
   const a = el.dataset.action, id = el.dataset.id, v = el.dataset.v;
   if (a === "scrim") { if (e.target === el) { S.sheet = null; S.armed = null; renderSheet(); } return; }
   if (a === "got") return; /* checkbox: handled on change */
-  if (!["clear-done","delete","signout","leave","clearideas"].includes(a)) S.armed = null;
+  if (!["clear-done","delete","signout","leave","clearideas","pclear"].includes(a)) S.armed = null;
   const s = S.settings;
   switch (a){
     case "go": S.view = v; S.sheet = null; if (v !== "plan" && S.wk < 0) S.wk = 0; render(); window.scrollTo(0, 0); break;
@@ -2018,11 +2193,28 @@ document.addEventListener("click", async e => {
       S.armed = null; delete S.recipes[id]; persist("r-" + id); syncCandidates(); S.sheet = null; render(); toast("Recipe deleted."); break;
     case "clear-done": if (S.armed !== "clear") { S.armed = "clear"; render(); break; }
       S.armed = null; planRecipes().filter(r => r.done).forEach(r => { r.inPlan = false; saveRecipe(r); }); syncCandidates(); render(); break;
-    case "hidepantry": S.hidePantry = !S.hidePantry; render(); break;
+    case "useline": S.open.useup = !S.open.useup; render(); break;
+    case "haveit": case "needit": case "unhave": { const it = rowItem(el.dataset.k); if (!it) break;
+      if (a === "haveit") { it.have = true; delete it.need; addPantry([{ item: it.item, section: it.section }], { from: "have" }); }
+      else if (a === "needit") { it.need = true; delete it.have; }
+      else { delete it.have; it.need = true; const m = pantryMatch(it.item); if (m && m.always) toast(`${it.item} is marked "Always have" in your Pantry. It's back on the list for this trip.`); }
+      persistRow(el.dataset.k); render(); break; }
+    case "pantryadd": { const t = document.getElementById("padd"); const names = parsePasted(t ? t.value : "").filter(n => !S.pantry.some(p => p.item.toLowerCase() === n.toLowerCase()));
+      if (!names.length) { toast("Type an item, or several separated by commas."); break; }
+      const got = addPantry(names); const t2 = document.getElementById("padd"); if (t2) t2.value = ""; render(); toast(`Added ${got.length} to your pantry.`); break; }
+    case "palways": { const p = S.pantry.find(x => x.id === id); if (!p) break; p.always = !p.always; persist("pantry"); render(); break; }
+    case "prm": { const p = S.pantry.find(x => x.id === id); S.pantry = S.pantry.filter(x => x.id !== id); persist("pantry"); render(); if (p) toast(`${p.item} removed (used up).`); break; }
+    case "pclear": if (S.armed !== "pclear") { S.armed = "pclear"; render(); break; }
+      S.armed = null; S.pantry = S.pantry.filter(p => p.always); persist("pantry"); render(); toast("Pantry cleared. Items you always have were kept."); break;
+    case "snapsave": { const items = (S.snap && S.snap.items || []).filter(x => x.on); const got = addPantry(items, { from: "snap" }); S.snap = null; render(); toast(got.length ? `Added ${got.length} item${got.length > 1 ? "s" : ""} to your pantry.` : "Nothing new to add."); break; }
+    case "snapcancel": S.snap = null; render(); break;
+    case "scan": openScanner(); break;
+    case "scanclose": if (e.target === el || el.classList.contains("x")) stopScan(); break;
+    case "bcodego": { const b = document.getElementById("bcode"); lookupBarcode(b ? b.value : ""); break; }
     case "rebuild": await buildShopping(); render(); break;
     case "copy": {
       const rows = shopRows(); if (!rows.length) break;
-      const txt = aisleOrder().map(sec => { const its = rows.filter(i => i.section === sec && !i.got && !(S.hidePantry && i.pantry)); return its.length ? sec.toUpperCase() + "\n" + its.map(i => `- ${i.item}${i.quantity ? " (" + i.quantity + ")" : ""}`).join("\n") : ""; }).filter(Boolean).join("\n\n");
+      const txt = aisleOrder().map(sec => { const its = rows.filter(i => i.section === sec && !i.got && !expired(i) && !["have", "always"].includes(checkState(i))); return its.length ? sec.toUpperCase() + "\n" + its.map(i => `- ${i.item}${i.quantity ? " (" + i.quantity + ")" : ""}`).join("\n") : ""; }).filter(Boolean).join("\n\n");
       try { await navigator.clipboard.writeText(txt); toast("Shopping list copied."); }
       catch { const t = document.createElement("textarea"); t.value = txt; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} t.remove(); toast(ok ? "Shopping list copied." : "Couldn't copy the list on this device."); }
       break; }
@@ -2051,10 +2243,20 @@ document.addEventListener("change", e => {
   const t = e.target;
   if (t.dataset.action === "got") {
     const k = t.dataset.k;
-    if (k[0] === "m") { const l = shopFor().list; const it = l && l.items[Number(k.slice(1))]; if (it) { it.got = t.checked; persist("shopping"); } }
-    else { const it = S.extras.find(x => "x" + x.id === k); if (it) { it.got = t.checked; persist("extras"); } }
+    const it = rowItem(k);
+    if (it) {
+      it.got = t.checked;
+      if (t.checked) it.gotAt = Date.now(); else delete it.gotAt;
+      if (it.leftover) {
+        if (t.checked) { const p = addPantry([{ item: it.item, section: it.section, note: it.leftover + " left after this week's meals" }], { from: "leftover" })[0]; if (p) it.leftPantry = p.id; }
+        else if (it.leftPantry) { S.pantry = S.pantry.filter(p => p.id !== it.leftPantry); delete it.leftPantry; persist("pantry"); }
+      }
+      persistRow(k);
+    }
     render(); return;
   }
+  if (t.id === "shelf" && t.files && t.files.length) { const fs = [...t.files].slice(0, 4); if (t.files.length > 4) toast("Using the first 4 photos."); t.value = ""; snapShelf(fs); return; }
+  if (t.dataset.action === "snaptick" && S.snap) { const x = S.snap.items[Number(t.dataset.i)]; if (x) x.on = t.checked; render(); return; }
   if (t.id === "photo" && t.files && t.files.length) {
     const room = 6 - S.sheet.photos.length;
     if (t.files.length > room) toast("Up to 6 photos per recipe.");
@@ -2071,6 +2273,9 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && S.sheet) { S.sheet = null; renderSheet(); }
+  if (e.key === "Enter" && e.target.id === "padd") { e.preventDefault(); document.querySelector('[data-action="pantryadd"]')?.click(); }
+  if (e.key === "Enter" && e.target.id === "bcode") { e.preventDefault(); document.querySelector('[data-action="bcodego"]')?.click(); }
+  if (e.key === "Escape" && document.querySelector("#scanRoot .scrim")) stopScan();
   if (e.key === "Enter" && e.target.id === "askreq") { e.preventDefault(); document.querySelector('[data-action="askgo"]')?.click(); }
   if (e.key === "Enter" && e.target.id === "sq") { e.preventDefault(); document.querySelector('[data-action="search"]')?.click(); }
   if (e.key === "Enter" && e.target.id === "req") { e.preventDefault(); e.target.blur(); document.querySelector('[data-action="generate"]')?.click(); }
@@ -2116,6 +2321,7 @@ const endAisleDrag = e => {
 document.addEventListener("pointerup", endAisleDrag);
 document.addEventListener("pointercancel", endAisleDrag);
 
+setInterval(() => { if (S.loaded && S.view === "shopping" && !S.sheet && !isEditing() && shopRows().some(expired)) render(); }, 60e3);
 /* ---------- start ---------- */
 async function init(){
   try { loadLocal(); render(); } catch (e) { console.error(e); }
